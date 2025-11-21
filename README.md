@@ -1,37 +1,31 @@
-# Guía rápida para desplegar y usar Finwise
+# Guía rápida para desplegar y usar la template del proyecto
 
 ## 1. Preparar el proyecto
 1. `git clone <repo>` y entra en la carpeta.
 2. Instala dependencias: `npm install`.
-3. Ten a mano Node 18+, una cuenta en Vercel y un proyecto Neon.
+3. Ten a mano Node 18+, una cuenta en Vercel y cuenta de Neon (está asociado a Vercel).
 
 ## 2. Configurar Vercel y Neon
 1. Importa el repo en Vercel (la primera build fallará por falta de variables).
-2. En **Storage**, crea/conecta una base Neon y copia el snippet completo (usa la URL que termina en `-pooler...?sslmode=require`).
-3. Genera `AUTH_SECRET` con `node -e "console.log(require(''crypto'').randomBytes(32).toString(''hex''))"`.
-4. Ve a **Settings ? Environment Variables**, pega todas las variables del snippet y añade `AUTH_SECRET`. Guarda los cambios y redeploya.
+2. En **Storage**, crea/conecta una base de datos de Neon y copia el snippet completo.
+3. Ve a **Settings > Environment Variables**, pega todas las variables del snippet. (Control+V valdrá)
+4. Genera `AUTH_SECRET` con `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Para esto usa la Terminal de Visual Studio Code.
+5. Ve a **Settings > Environment Variables**, añade `AUTH_SECRET` y la clave hexadecimal generada.
+6. Guarda los cambios y haz un redeploy.
+7. Ya tenemos lista la aplicación web.
+
 
 ## 3. Variables locales
-1. Crea `.env.local` (no se comitea) con las mismas variables que en Vercel:
-
-   ```ini
-   DATABASE_URL=postgresql://neondb_owner:...@ep-xxxx-pooler.../neondb?sslmode=require
-   AUTH_SECRET=<tu hex de 64 caracteres>
-   AUTH_TRUST_HOST=true
-   ```
-
+1. Crea `.env.local` (no se comitea) con las mismas variables que en Vercel. Puedes hacer lo mismo que pasos 2 y 4 de antes. Importante que sea el mismo AUTH_SECRET y la misma DATABASE_URL.
 2. Puedes incluir también `POSTGRES_URL`, etc. Next.js lee `.env.local` automáticamente.
 
 ## 4. Migraciones y seed
-En cada terminal que toques la base, exporta la URL antes de correr los scripts:
+En cada terminal que toques la base de datos, exporta la URL antes de correr los scripts:
 
-```powershell
-$env:DATABASE_URL="postgresql://neondb_owner:...@ep-xxxx-pooler.../neondb?sslmode=require"
+$env:DATABASE_URL="postgresql://neondb_owner:...@ep-xxxx-pooler.../neondb?sslmode=require"  #Tendrás que poner la URL de la base de datos que quieras usar
 npm run db:migrate   # crea tablas (migrations/001_init.sql)
 npm run db:seed      # inserta/actualiza demo@finwise.dev / Demo123! (migrations/002_seed.sql)
-```
 
-- Si prefieres evitar el `export`, usa `npx dotenv -e .env.local -- npm run db:migrate`.
 - Repite estos comandos contra la base productiva si necesitas regenerar el usuario demo.
 
 ## 5. Desarrollo local
