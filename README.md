@@ -1,4 +1,4 @@
-# Guía rápida para desplegar y usar la template del proyecto
+# Guía rápida para desplegar y usar la template del proyecto (test)
 
 ## 1. Preparar el proyecto
 1. `git clone <repo>` y entra en la carpeta.
