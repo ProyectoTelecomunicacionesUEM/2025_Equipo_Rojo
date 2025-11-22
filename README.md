@@ -1,22 +1,25 @@
-# Guía rápida para desplegar y usar la template del proyecto (test)
+# Guía rápida para desplegar y usar la template del proyecto
 
 ## 1. Preparar el proyecto
 1. `git clone <repo>` y entra en la carpeta.
 2. Instala dependencias: `npm install`.
+    2.1 En caso de que de error (`node no se reconoce como un comando`) comprueba si tienes instalado Node.js. Si no lo tienes descargalo en: https://nodejs.org/en/download 
+    2.2 En caso de que de error `"No se puede cargar el archivo C:\Program Files\nodejs\npm.ps1 porque la ejecución de scripts está deshabilitada en este sistema."` hay que escribir en la terminal de VSC (Powershell) lo siguiente:
+         `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
+
 3. Ten a mano Node 18+, una cuenta en Vercel y cuenta de Neon (está asociado a Vercel).
 
 ## 2. Configurar Vercel y Neon
 1. Importa el repo en Vercel (la primera build fallará por falta de variables).
 2. En **Storage**, crea/conecta una base de datos de Neon y copia el snippet completo.
 3. Ve a **Settings > Environment Variables**, pega todas las variables del snippet. (Control+V valdrá)
-4. Genera `AUTH_SECRET` con `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Para esto usa la Terminal de Visual Studio Code.
+4. Genera `AUTH_SECRET` ejecutando `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Para esto usa la Terminal de Visual Studio Code.
 5. Ve a **Settings > Environment Variables**, añade `AUTH_SECRET` y la clave hexadecimal generada.
 6. Guarda los cambios y haz un redeploy.
 7. Ya tenemos lista la aplicación web.
 
-
 ## 3. Variables locales
-1. Crea `.env.local` (no se comitea) con las mismas variables que en Vercel. Puedes hacer lo mismo que pasos 2 y 4 de antes. Importante que sea el mismo AUTH_SECRET y la misma DATABASE_URL.
+1. Crea `.env.local` (no se comitea) con las mismas variables que en Vercel (Neon y AUTH_SECRET). Puedes hacer lo mismo que pasos 2 y 4 de antes. Importante que sea el mismo AUTH_SECRET y la misma DATABASE_URL.
 2. Puedes incluir también `POSTGRES_URL`, etc. Next.js lee `.env.local` automáticamente.
 
 ## 4. Migraciones y seed
@@ -27,9 +30,6 @@ npm run db:migrate   # crea tablas (migrations/001_init.sql)
 npm run db:seed      # inserta/actualiza demo@finwise.dev / Demo123! (migrations/002_seed.sql)
 
 - Repite estos comandos contra la base productiva si necesitas regenerar el usuario demo.
-
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-
 
 ## 5. Desarrollo local
 1. Ejecuta `npm run dev`.
