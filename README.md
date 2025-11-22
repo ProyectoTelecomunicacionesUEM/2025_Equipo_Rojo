@@ -28,6 +28,9 @@ npm run db:seed      # inserta/actualiza demo@finwise.dev / Demo123! (migrations
 
 - Repite estos comandos contra la base productiva si necesitas regenerar el usuario demo.
 
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+
 ## 5. Desarrollo local
 1. Ejecuta `npm run dev`.
 2. Abre [http://localhost:3000/login](http://localhost:3000/login).
