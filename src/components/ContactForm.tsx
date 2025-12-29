@@ -42,11 +42,13 @@ export default function ContactForm() {
       alert("¡Mensaje enviado correctamente!");
       form.reset();
       setCaptchaToken(null);
-    } catch (err: any) {
-      alert(err.message || "Error al enviar. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
-    }
+   
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Error al enviar. Intenta de nuevo.";
+        alert(msg);
+      } finally {
+        setLoading(false);
+      }
   }
 
   return (
