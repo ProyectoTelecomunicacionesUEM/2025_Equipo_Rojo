@@ -4,8 +4,12 @@ import * as React from "react";
 import ReCAPTCHA from "react-google-recaptcha";
 
 export default function ContactForm() {
-  // ❌ NO usar "!" — puede ser undefined en runtime
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  
+React.useEffect(() => {
+  console.log("SITE KEY:", siteKey);
+  (window as any).SITE_KEY = siteKey; // para poder leerla en la consola
+}, [siteKey]);
 
   const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
