@@ -1,5 +1,6 @@
 
 import type { Metadata } from "next";
+import Script from "next/script";                    // 👈 AÑADE ESTO
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Source_Sans_3, Manrope } from "next/font/google";
 
@@ -46,18 +47,19 @@ export default function RootLayout({
           <GoogleAnalytics gaId={siteDetails.googleAnalyticsId} />
         )}
 
-        {/* Header (        {/* Header (uno solo, arriba) */}
+        {/* Header */}
         <HeaderWrapper />
 
-        {/* Contenido principal (un solo main) */}
+        {/* Contenido principal */}
         <main className="flex-1 flow-root">
           {children}
         </main>
 
-        {/* Footer (abajo) */}
+        {/* Footer */}
         <FooterMain />
+
+        https://www.google.com/recaptcha/api.js
       </body>
     </html>
   );
-
 }
