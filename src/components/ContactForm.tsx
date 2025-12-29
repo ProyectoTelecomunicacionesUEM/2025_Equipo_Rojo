@@ -5,12 +5,6 @@ import ReCAPTCHA from "react-google-recaptcha";
 
 export default function ContactForm() {
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-  
-React.useEffect(() => {
-  console.log("SITE KEY:", siteKey);
-(window as unknown as { SITE_KEY?: string }).SITE_KEY = siteKey;}, 
-[siteKey]);
-
   const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -141,8 +135,7 @@ React.useEffect(() => {
           He leído y acepto la{" "}
           <a
             href="/politica-privacidad"
-            className="underline text-orange-600 hover:text-orange-700"
-          >
+            className="underline text-orange-600 pointer-events-none"          >
             Política de Privacidad de Datos
           </a>
           .
