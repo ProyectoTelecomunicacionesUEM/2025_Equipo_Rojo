@@ -1,12 +1,13 @@
+
 export const siteDetails = {
-    siteName: 'Finwise',
-    siteUrl: 'https://finwise-omega.vercel.app/',
+    siteName: 'FrostTrack',
+    siteUrl: 'https://frosttrack.vercel.app/',
     metadata: {
-        title: 'Finwise - Next.js and Tailwind CSS Landing Page Template',
-        description: 'Finwise empowers businesses with cutting-edge technology solutions to drive success and efficiency.',
+        title: 'FrostTrack - Plataforma IoT en tiempo real',
+        description: 'Monitoriza sensores IoT en tiempo real y gestiona dispositivos fácilmente.',
     },
-    language: 'en-us',
-    locale: 'en-US',
-    siteLogo: `${process.env.BASE_PATH || ''}/images/logo.png`, // or use a string for the logo e.g. "TechStartup"
-    googleAnalyticsId: '', // e.g. G-XXXXXXX,
-}
+    language: 'es-es',
+    locale: 'es-ES',
+    siteLogo: '/images/camionIcono.png', // o 'FrostTrack' si no tienes logo
+    googleAnalyticsId: '', // opcional
+};

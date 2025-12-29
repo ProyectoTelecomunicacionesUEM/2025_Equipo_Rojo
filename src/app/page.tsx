@@ -1,46 +1,20 @@
-import Hero from "@/components/Hero";
-import Testimonials from "@/components/Testimonials";
-import Pricing from "@/components/Pricing/Pricing";
-import FAQ from "@/components/FAQ";
-import Logos from "@/components/Logos";
-import Benefits from "@/components/Benefits/Benefits";
-import Container from "@/components/Container";
-import Section from "@/components/Section";
-import Stats from "@/components/Stats";
-import CTA from "@/components/CTA";
 
-const HomePage: React.FC = () => {
+import ContactForm from "@/components/ContactForm";
+
+export default function Home() {
   return (
     <>
-      <Hero />
-      <Logos />
-      <Container>
-        <Benefits />
+      {/* Sección de contacto (sin main adicional) */}
+<section id="contacto" className="w-full pt-24 md:pt-32 pb-16">        {/* Limita ancho en desktop, sin padding lateral */}
+        <div className="w-full max-w-3xl mx-auto px-0">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-8">
+            ¿Quieres conocernos?
+          </h2>
 
-        <Section
-          id="pricing"
-          title="Pricing"
-          description="Simple, transparent pricing. No surprises."
-        >
-          <Pricing />
-        </Section>
-
-        <Section
-          id="testimonials"
-          title="What Our Clients Say"
-          description="Hear from those who have partnered with us."
-        >
-          <Testimonials />
-        </Section>
-
-        <FAQ />
-
-        <Stats />
-        
-        <CTA />
-      </Container>
+          {/* El formulario ya lleva su padding interno */}
+          <ContactForm />
+        </div>
+      </section>
     </>
   );
-};
-
-export default HomePage;
+}

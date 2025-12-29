@@ -1,14 +1,15 @@
+
 'use client';
 
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { Transition } from '@headlessui/react';
 import { HiOutlineXMark, HiBars3 } from 'react-icons/hi2';
-import { FaFingerprint } from 'react-icons/fa';
 
 import Container from './Container';
 import { siteDetails } from '@/data/siteDetails';
 import { menuItems } from '@/data/menuItems';
+import Image from "next/image";
 
 const Header: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -22,33 +23,44 @@ const Header: React.FC = () => {
             <Container className="!px-0">
                 <nav className="shadow-md md:shadow-none bg-white md:bg-transparent mx-auto flex justify-between items-center py-2 px-5 md:py-10">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2">
-                        <FaFingerprint className="text-foreground min-w-fit w-7 h-7" />
-                        <span className="manrope text-xl font-semibold text-foreground cursor-pointer">
-                            {siteDetails.siteName}
-                        </span>
+                    <Link href="/" className="flex items-center gap-2"> 
+                    <Image
+                        src={siteDetails.siteLogo || "/icon-512.png"} // fallback por si no hubiera logo
+                        alt={siteDetails.siteName}
+                        width={90}   // tamaño en desktop (ajustable)
+                        height={90}
+                        priority
+                        className="w-12 h-12 md:w-16 md:h-16 object-contain" // móvil 32px, desktop 48px
+                    />
+                    <span className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                    {siteDetails.siteName}
+                    </span>
                     </Link>
-
                     {/* Desktop Menu */}
                     <ul className="hidden md:flex space-x-6 items-center">
                         {menuItems.map(item => (
                             <li key={item.text}>
-                                <Link href={item.url} className="text-foreground hover:text-foreground-accent transition-colors">
+                                <Link href={item.url} className="text-2xl  font-bold tracking-wider text-foreground hover:text-foreground-accent transition-colors">
                                     {item.text}
                                 </Link>
                             </li>
                         ))}
+                        {/* Botón Inicia sesión */}
                         <li>
                             <Link
                                 href="/login"
-                                className="text-foreground border border-foreground rounded-full px-6 py-2 hover:bg-foreground hover:text-white transition-colors"
+                                className="border border-blue-600 text-blue-600 rounded-full px-6 py-2 hover:bg-blue-50 transition-colors"
                             >
-                                Login
+                                Inicia sesión
                             </Link>
                         </li>
+                        {/* Botón Regístrate */}
                         <li>
-                            <Link href="#cta" className="text-black bg-primary hover:bg-primary-accent px-8 py-3 rounded-full transition-colors">
-                                Download
+                            <Link
+                                href="/register"
+                                className="bg-blue-600 text-white rounded-full px-6 py-2 hover:bg-blue-700 transition-colors"
+                            >
+                                Regístrate
                             </Link>
                         </li>
                     </ul>
@@ -92,18 +104,24 @@ const Header: React.FC = () => {
                                 </Link>
                             </li>
                         ))}
+                        {/* Botón Inicia sesión móvil */}
                         <li>
                             <Link
                                 href="/login"
-                                className="text-foreground border border-foreground rounded-full px-5 py-2 block w-fit"
+                                className="border border-blue-600 text-blue-600 rounded-full px-5 py-2 block w-fit hover:bg-blue-50"
                                 onClick={toggleMenu}
                             >
-                                Login
+                                Inicia sesión
                             </Link>
                         </li>
+                        {/* Botón Regístrate móvil */}
                         <li>
-                            <Link href="#cta" className="text-black bg-primary hover:bg-primary-accent px-5 py-2 rounded-full block w-fit" onClick={toggleMenu}>
-                                Get Started
+                            <Link
+                                href="/register"
+                                className="bg-blue-600 text-white rounded-full px-5 py-2 block w-fit hover:bg-blue-700"
+                                onClick={toggleMenu}
+                            >
+                                Regístrate
                             </Link>
                         </li>
                     </ul>
