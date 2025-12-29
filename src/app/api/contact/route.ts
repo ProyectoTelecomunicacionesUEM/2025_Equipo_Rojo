@@ -1,14 +1,14 @@
+
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-export const runtime = "nodejs";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const runtime = "nodejs"; // asegúrate de no usar 'edge' para Resend
 
 export async function POST(req: Request) {
   try {
     const { nombre, correo, telefono, mensaje, token } = await req.json();
 
+    // Validación básica de payload
     if (!nombre || !correo || !mensaje || !token) {
       return NextResponse.json(
         { ok: false, error: "Faltan datos o captcha" },
@@ -16,7 +16,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const secretKey = process.env.RECAPTCHA_SECRET_KEY!;
+    // Verificación reCAPTCHA
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+    if (!secretKey) {
+      return NextResponse.json(
+        { ok: false, error: "Falta RECAPTCHA_SECRET_KEY" },
+        { status: 500 }
+      );
+    }
+
     const verifyRes = await fetch(
       "https://www.google.com/recaptcha/api/siteverify",
       {
@@ -25,6 +33,7 @@ export async function POST(req: Request) {
         body: new URLSearchParams({
           secret: secretKey,
           response: token,
+          // remoteip opcional
         }),
       }
     );
@@ -38,9 +47,23 @@ export async function POST(req: Request) {
       );
     }
 
+    // Inicializa Resend dentro del handler (evita evaluar en build)
+    const apiKey = process.env.RESEND_API_KEY;
+    const from = process.env.CONTACT_FROM;
+    const to = process.env.CONTACT_TO;
+
+    if (!apiKey || !from || !to) {
+      return NextResponse.json(
+        { ok: false, error: "Faltan variables de entorno (RESEND_API_KEY, CONTACT_FROM, CONTACT_TO)" },
+        { status: 500 }
+      );
+    }
+
+    const resend = new Resend(apiKey);
+
     const { error } = await resend.emails.send({
-      from: process.env.CONTACT_FROM!,
-      to: process.env.CONTACT_TO!,
+      from,
+      to,
       subject: `Nuevo mensaje de contacto: ${nombre}`,
       replyTo: correo,
       html: `
@@ -49,7 +72,7 @@ export async function POST(req: Request) {
         <p><strong>Correo:</strong> ${correo}</p>
         <p><strong>Teléfono:</strong> ${telefono || "No indicado"}</p>
         <p><strong>Mensaje:</strong></p>
-        <p>${mensaje.replace(/\n/g, "<br/>")}</p>
+        <p>${String(mensaje).replace(/\n/g, "<br/>")}</p>
       `,
     });
 
