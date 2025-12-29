@@ -1,6 +1,6 @@
 
 import type { Metadata } from "next";
-import Script from "next/script";                    // 👈 AÑADE ESTO
+import Script from "next/script"; // ✅ Importa Script
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Source_Sans_3, Manrope } from "next/font/google";
 
@@ -57,8 +57,9 @@ export default function RootLayout({
 
         {/* Footer */}
         <FooterMain />
-
-        https://www.google.com/recaptcha/api.js
+        <Script
+        src="https://www.google.com/recaptcha/api.js"
+        strategy="afterInteractive"/>
       </body>
     </html>
   );
