@@ -8,8 +8,8 @@ export default function ContactForm() {
   
 React.useEffect(() => {
   console.log("SITE KEY:", siteKey);
-  (window as any).SITE_KEY = siteKey; // para poder leerla en la consola
-}, [siteKey]);
+(window as unknown as { SITE_KEY?: string }).SITE_KEY = siteKey;}, 
+[siteKey]);
 
   const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
