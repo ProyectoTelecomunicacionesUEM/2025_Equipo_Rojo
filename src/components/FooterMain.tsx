@@ -5,17 +5,42 @@ import { siteDetails } from "@/data/siteDetails";
 import { footerDetails } from "@/data/footer";
 import { FaInstagram, FaFacebook, FaXTwitter, FaLinkedinIn } from "react-icons/fa6";
 
+// 🧾 Tipos esperados de los módulos de datos
+type SiteDetails = {
+  siteName: string;
+  contactEmail?: string;
+  contactPhone?: string;
+};
+
+type Socials = {
+  instagram?: string;
+  facebook?: string;
+  x?: string;
+  twitter?: string; // por compatibilidad si el dato se llama "twitter"
+  linkedin?: string;
+};
+
+type FooterDetails = {
+  email?: string;
+  telephone?: string;
+  socials?: Socials;
+};
+
+// 🔒 Tipa los imports (sin usar `any`)
+const sd = siteDetails as SiteDetails;
+const fd = footerDetails as FooterDetails;
+
 const FooterMain: React.FC = () => {
   const year = new Date().getFullYear();
 
-  const email = footerDetails?.email || (siteDetails as any)?.contactEmail;
-  const phone = footerDetails?.telephone || (siteDetails as any)?.contactPhone;
+  const email = fd?.email || sd?.contactEmail;
+  const phone = fd?.telephone || sd?.contactPhone;
 
-  const socials = {
-    instagram: footerDetails?.socials?.instagram,
-    facebook: footerDetails?.socials?.facebook,
-    x: footerDetails?.socials?.x || footerDetails?.socials?.twitter,
-    linkedin: footerDetails?.socials?.linkedin,
+  const socials: Socials = {
+    instagram: fd?.socials?.instagram,
+    facebook: fd?.socials?.facebook,
+    x: fd?.socials?.x || fd?.socials?.twitter,
+    linkedin: fd?.socials?.linkedin,
   };
 
   // Badges redondos blancos
@@ -30,7 +55,6 @@ const FooterMain: React.FC = () => {
       <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-5 md:py-6">
         {/* En móvil: permite wrap; en desktop: alinea verticalmente */}
         <div className="flex flex-wrap items-center justify-center gap-3 md:gap-8 text-center">
-
           {/* Contacto */}
           <div className="flex items-center gap-4">
             {email && (
@@ -106,7 +130,7 @@ const FooterMain: React.FC = () => {
 
           {/* Copyright */}
           <p className="text-sm md:text-base font-semibold text-white/90">
-            © {year} {siteDetails.siteName}. Todos los derechos reservados.
+            © {year} {sd.siteName}. Todos los derechos reservados.
           </p>
         </div>
       </div>
