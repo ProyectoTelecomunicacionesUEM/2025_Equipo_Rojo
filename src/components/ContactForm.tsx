@@ -17,7 +17,7 @@ export default function ContactForm() {
   // ---------- TELÉFONO ----------
   function handleTelefonoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value;
-    let cleaned = raw.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
+    const  cleaned = raw.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
     const hasPlus = cleaned.startsWith("+");
     let digits = cleaned.replace(/[^\d]/g, "");
 
