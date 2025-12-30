@@ -253,16 +253,23 @@ export default function ContactForm() {
           placeholder="Cuéntanos en qué podemos ayudarte"
         />
       </div>
-
       {/* PRIVACIDAD */}
       <div className="flex items-start gap-2 text-sm">
-        <input id="privacidad" name="privacidad" type="checkbox" required className="mt-1" />
-        <label htmlFor="privacidad">
-          He leído y acepto la{" "}
-          <a href="/politica-privacidad" className="underline text-orange-600">Política de Privacidad de Datos</a>.
-        </label>
-      </div>
-
+    <input
+      id="privacidad"
+      name="privacidad"
+      type="checkbox"
+      required
+      className="mt-1"
+    />
+    <label htmlFor="privacidad">
+      He leído y acepto la{" "}
+      <span className="underline text-orange-600 cursor-not-allowed">
+        Política de Privacidad de Datos
+      </span>
+      .
+    </label>
+     </div>
       {/* RECAPTCHA */}
       {!siteKey && <p className="text-red-600 text-sm">Falta configurar reCAPTCHA en el servidor.</p>}
       {siteKey && (
