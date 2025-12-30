@@ -142,4 +142,78 @@ html, body {
   .login-background {
     justify-content: center;
   }
+
+  
+/* Altura y posicionamiento del hero */
+.ft-hero {
+  position: relative;
+  min-height: clamp(420px, 70vh, 720px); /* altura visible */
+  overflow: hidden;
+  background: #000; /* fallback por si tarda en cargar */
+}
+
+/* La imagen ocupa todo el hero */
+.ft-hero__imgwrap {
+  position: absolute;
+  inset: 0; /* top/right/bottom/left: 0 */
+}
+
+/* Ajuste de la imagen para que cubra */
+.ft-hero__bg {
+  object-fit: cover;
+  filter: brightness(0.78) contrast(1.05); /* mejora el contraste del texto */
+  z-index: 0;
+}
+
+/* Degradado sutil que reserva el lado izquierdo para el texto */
+.ft-hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0,0,0,0.55) 0%,
+    rgba(0,0,0,0.40) 25%,
+    rgba(0,0,0,0.10) 55%,
+    rgba(0,0,0,0.00) 75%
+  );
+  z-index: 1;
+}
+
+/* Contenido encima de la imagen */
+.ft-hero__content {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  text-align: left;
+  padding: 56px 20px;
+  max-width: 640px; /* evita invadir el lado del camión */
+}
+
+/* Contenedor global (si no lo tienes ya) */
+.ft-container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Título responsivo con sombra sutil */
+.ft-hero__content h1 {
+  font-size: clamp(28px, 5vw, 56px);
+  line-height: 1.08;
+  margin: 0;
+  text-shadow: 0 2px 18px rgba(0,0,0,0.35);
+}
+
+/* En desktop, más margen a la izquierda */
+@media (min-width: 1024px) {
+  .ft-hero__content { padding-left: 40px; }
+}
+
+@layer utilities {
+  .text-secondary {
+    color: var(--secondary);
+  }
+}
+
 }

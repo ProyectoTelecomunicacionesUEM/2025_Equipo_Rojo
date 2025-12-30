@@ -1,46 +1,160 @@
-import React from 'react';
+'use client';
+
 import Image from 'next/image';
+import Link from 'next/link';
+import React, { useState } from 'react';
+import { Transition } from '@headlessui/react';
+import { HiOutlineXMark, HiBars3 } from 'react-icons/hi2';
 
-import AppStoreButton from './AppStoreButton';
-import PlayStoreButton from './PlayStoreButton';
+import Container from './Container';
+import { siteDetails } from '@/data/siteDetails';
+import { menuItems } from '@/data/menuItems';
 
-import { heroDetails } from '@/data/hero';
+export default function Hero() {
+  const [isOpen, setIsOpen] = useState(false);
+  const toggleMenu = () => setIsOpen(!isOpen);
 
-const Hero: React.FC = () => {
-    return (
-        <section
-            id="hero"
-            className="relative flex items-center justify-center pb-0 pt-32 md:pt-40 px-5"
+  return (
+    <section className="relative w-full h-[400px] md:h-[520px] overflow-hidden">
+      {/* IMAGEN DE FONDO RESPONSIVE */}
+      <Image
+        src="/images/camionPaisaje.png"
+        alt="Camión frigorífico circulando por el paisaje"
+        fill
+        priority
+        style={{
+          objectFit: 'cover',       // llena el contenedor
+          objectPosition: 'center', // centra la imagen
+        }}
+      />
+
+      {/* OVERLAY OSCURO */}
+      <div className="absolute inset-0 bg-black/30 z-0" />
+
+      {/* HEADER */}
+      <header className="absolute top-0 left-0 right-0 z-50 w-full">
+        <Container className="!px-0">
+          <nav className="relative flex items-center bg-white/90 md:bg-transparent shadow-md md:shadow-none px-5 py-4 md:py-6 min-h-[72px] md:min-h-[96px]">
+            {/* MENÚ DESKTOP */}
+            <ul className="hidden md:flex items-center gap-8">
+              {menuItems.map((item) => (
+                <li key={item.text}>
+                  <Link
+                    href={item.url}
+                    className="text-white font-semibold"
+                    style={{
+                      fontSize: 'clamp(18px, 1.8vw, 24px)',
+                      textShadow: '0 1px 14px rgba(0,0,0,0.40)',
+                    }}
+                  >
+                    {item.text}
+                  </Link>
+                </li>
+              ))}
+
+              <li>
+                <Link
+                  href="/login"
+                  className="inline-flex items-center rounded-full px-5 py-3
+                    bg-gradient-to-r from-blue-600 to-cyan-500
+                    text-white font-extrabold shadow-lg
+                    transition hover:brightness-110"
+                  style={{ fontSize: 'clamp(16px, 1.6vw, 20px)' }}
+                >
+                  Inicia sesión
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center rounded-full px-5 py-3
+                    bg-gradient-to-r from-blue-600 to-cyan-500
+                    text-white font-extrabold shadow-lg
+                    transition hover:brightness-110"
+                  style={{ fontSize: 'clamp(16px, 1.6vw, 20px)' }}
+                >
+                  Regístrate
+                </Link>
+              </li>
+            </ul>
+
+            {/* BOTÓN MENÚ MÓVIL */}
+            <button
+              onClick={toggleMenu}
+              type="button"
+              className="md:hidden ml-auto rounded-full w-10 h-10 flex items-center justify-center bg-white/80"
+              aria-expanded={isOpen}
+            >
+              {isOpen ? (
+                <HiOutlineXMark className="h-6 w-6" />
+              ) : (
+                <HiBars3 className="h-6 w-6" />
+              )}
+              <span className="sr-only">Toggle navigation</span>
+            </button>
+          </nav>
+        </Container>
+
+        {/* TÍTULO GRANDE */}
+        <div className="hidden md:block absolute left-0 right-0 top-full mt-4 pointer-events-none">
+          <Container className="!px-5">
+            <h1
+              className="
+                font-extrabold leading-none whitespace-nowrap
+                bg-gradient-to-r from-blue-600 to-cyan-500
+                bg-clip-text text-transparent
+                drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)]
+              "
+              style={{
+                fontSize: 'clamp(56px, 7vw, 120px)',
+                letterSpacing: '0.5px',
+              }}
+            >
+              FrostTrack
+            </h1>
+          </Container>
+        </div>
+
+        {/* MENÚ MÓVIL */}
+        <Transition
+          show={isOpen}
+          enter="transition ease-out duration-200"
+          enterFrom="opacity-0 scale-95"
+          enterTo="opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="opacity-100 scale-100"
+          leaveTo="opacity-0 scale-95"
         >
-            <div className="absolute left-0 top-0 bottom-0 -z-10 w-full">
-                <div className="absolute inset-0 h-full w-full bg-hero-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_60%,transparent_100%)]">
-                </div>
-            </div>
+          <div className="md:hidden bg-white shadow-lg">
+            <ul className="flex flex-col space-y-5 py-6 px-6">
+              {menuItems.map((item) => (
+                <li key={item.text}>
+                  <Link
+                    href={item.url}
+                    className="text-gray-800 text-lg"
+                    onClick={toggleMenu}
+                  >
+                    {item.text}
+                  </Link>
+                </li>
+              ))}
 
-            <div className="absolute left-0 right-0 bottom-0 backdrop-blur-[2px] h-40 bg-gradient-to-b from-transparent via-[rgba(233,238,255,0.5)] to-[rgba(202,208,230,0.5)]">
-            </div>
+              <li>
+                <Link href="/login" onClick={toggleMenu}>
+                  Inicia sesión
+                </Link>
+              </li>
 
-            <div className="text-center">
-                <h1 className="text-4xl md:text-6xl md:leading-tight font-bold text-foreground max-w-lg md:max-w-2xl mx-auto">{heroDetails.heading}</h1>
-                <p className="mt-4 text-foreground max-w-lg mx-auto">{heroDetails.subheading}</p>
-                <div className="mt-6 flex flex-col sm:flex-row items-center sm:gap-4 w-fit mx-auto">
-                    <AppStoreButton dark />
-                    <PlayStoreButton dark />
-                </div>
-                <Image
-                    src={heroDetails.centerImageSrc}
-                    width={384}
-                    height={340}
-                    quality={100}
-                    sizes="(max-width: 768px) 100vw, 384px"
-                    priority={true}
-                    unoptimized={true}
-                    alt="app mockup"
-                    className='relative mt-12 md:mt-16 mx-auto z-10'
-                />
-            </div>
-        </section>
-    );
-};
-
-export default Hero;
+              <li>
+                <Link href="/register" onClick={toggleMenu}>
+                  Regístrate
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </Transition>
+      </header>
+    </section>
+  );
+}

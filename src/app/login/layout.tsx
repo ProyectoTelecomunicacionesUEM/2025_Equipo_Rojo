@@ -5,9 +5,9 @@ import DarkModeToggle from "@/components/DarkModeToggle";
 export default function LoginLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col md:flex-row h-screen">
-      {/* Imagen lado izquierdo */}
+      {/* Imagen lado izquierdo (solo en desktop) */}
       <div
-        className="w-full md:w-1/2 h-48 md:h-full bg-cover bg-center"
+        className="hidden md:block w-1/2 bg-cover bg-center"
         style={{ backgroundImage: "url('/images/camionIcono.png')" }}
       ></div>
 
