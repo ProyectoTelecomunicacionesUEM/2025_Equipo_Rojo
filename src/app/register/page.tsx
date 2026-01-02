@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image"; // <- import obligatorio
 import { registerAction } from "./actions";
 import styles from "./styles.module.css";
 
@@ -50,11 +51,15 @@ export default function RegisterPage() {
         <div className={styles.split}>
           {/* Columna izquierda */}
           <div className={styles.left}>
-            <img
+            {/* Imagen optimizada con Next.js */}
+            <Image
               src="/images/imagenRegistro.png"
               alt="Registro de usuario"
-              className={styles.heroImage}
               title="Imagen ilustrativa del registro de usuario"
+              width={600}    // ancho real de tu imagen
+              height={400}   // alto real de tu imagen
+              className={styles.heroImage}
+              priority       // carga rápida para LCP
             />
           </div>
 
@@ -170,7 +175,7 @@ export default function RegisterPage() {
                   type="submit"
                   className={styles.button}
                   disabled={pending}
-                    title="Registrarse como usuario"
+                  title="Registrarse como usuario"
                 >
                   {pending ? "Registrando..." : "Registrarse"}
                 </button>
