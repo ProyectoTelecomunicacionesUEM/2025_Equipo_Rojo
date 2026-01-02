@@ -26,7 +26,7 @@ export default function Hero() {
           className="object-contain md:object-cover"
         />
 
-        {/* OVERLAY SOLO DESKTOP */}
+        {/* OVERLAY */}
         <div className="hidden md:block absolute inset-0 bg-black/30 z-10" />
 
         {/* HEADER / NAV */}
@@ -37,28 +37,77 @@ export default function Hero() {
               <ul className="hidden md:flex items-center gap-8">
                 {menuItems.map((item) => (
                   <li key={item.text}>
-                    <Link href={item.url} className="text-white font-semibold">
+                    <Link
+                      href={item.url}
+                      className="text-white font-semibold relative z-50"
+                    >
                       {item.text}
                     </Link>
                   </li>
                 ))}
 
+                {/* INICIAR SESIÓN (tooltip) */}
                 <li>
-                  <Link
-                    href="/login"
-                    className="rounded-full px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold"
-                  >
-                    Inicia sesión
-                  </Link>
+                  <div className="relative group">
+                    <Link
+                      href="/login"
+                      className="
+                        relative z-50
+                        rounded-full px-5 py-2
+                        bg-gradient-to-r from-blue-600 to-cyan-500
+                        text-white font-bold
+                      "
+                    >
+                      Inicia sesión
+                    </Link>
+
+                    <span
+                      className="
+                        pointer-events-none
+                        absolute left-1/2 -translate-x-1/2 mt-2
+                        opacity-0 group-hover:opacity-100
+                        transition
+                        bg-black text-white text-xs
+                        px-3 py-1 rounded
+                        whitespace-nowrap
+                        z-50
+                      "
+                    >
+                      Accede a tu cuenta
+                    </span>
+                  </div>
                 </li>
 
+                {/* REGÍSTRATE (tooltip) */}
                 <li>
-                  <Link
-                    href="/register"
-                    className="rounded-full px-5 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold"
-                  >
-                    Regístrate
-                  </Link>
+                  <div className="relative group">
+                    <Link
+                      href="/register"
+                      className="
+                        relative z-50
+                        rounded-full px-5 py-2
+                        bg-gradient-to-r from-blue-600 to-cyan-500
+                        text-white font-bold
+                      "
+                    >
+                      Regístrate
+                    </Link>
+
+                    <span
+                      className="
+                        pointer-events-none
+                        absolute left-1/2 -translate-x-1/2 mt-2
+                        opacity-0 group-hover:opacity-100
+                        transition
+                        bg-black text-white text-xs
+                        px-3 py-1 rounded
+                        whitespace-nowrap
+                        z-50
+                      "
+                    >
+                      Crea una cuenta nueva
+                    </span>
+                  </div>
                 </li>
               </ul>
 
@@ -98,7 +147,7 @@ export default function Hero() {
           </Transition>
         </header>
 
-        {/* ===== TÍTULO DESKTOP (CENTRADO VERTICALMENTE) ===== */}
+        {/* TÍTULO DESKTOP */}
         <div className="hidden md:flex absolute inset-0 z-20 items-center">
           <Container className="text-center md:text-left">
             <h1
@@ -120,7 +169,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ===== TÍTULO MÓVIL (DEBAJO DE LA IMAGEN) ===== */}
+      {/* TÍTULO MÓVIL */}
       <div className="md:hidden py-6 text-center">
         <h1
           className="
@@ -128,9 +177,7 @@ export default function Hero() {
             bg-gradient-to-r from-blue-600 to-cyan-500
             bg-clip-text text-transparent
           "
-          style={{
-            fontSize: 'clamp(28px, 8vw, 42px)',
-          }}
+          style={{ fontSize: 'clamp(28px, 8vw, 42px)' }}
         >
           FrostTrack
         </h1>
