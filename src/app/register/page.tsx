@@ -170,6 +170,7 @@ export default function RegisterPage() {
                   type="submit"
                   className={styles.button}
                   disabled={pending}
+                    title="Registrarse como usuario"
                 >
                   {pending ? "Registrando..." : "Registrarse"}
                 </button>
