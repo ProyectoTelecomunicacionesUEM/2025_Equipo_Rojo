@@ -2,7 +2,7 @@
 INSERT INTO users (email, password_hash, name)
 VALUES (
   'demo@finwise.dev',
-  '$2y$10$KuLzZ3DJ4oO50z2bToFU6u5rGskxJUOl6wGvyIr5L7EnMYLTZp0sG', -- bcrypt de "Demo123!"
+  '$2y$10$ciXQX/8y7LDx1EX7H6BsSO/L9JgKtiGk//5uZcAGxg8gn9wDTN8MC', -- Nueva contraseña: "123456"
   'Demo User'
 )
 ON CONFLICT (email) DO UPDATE
