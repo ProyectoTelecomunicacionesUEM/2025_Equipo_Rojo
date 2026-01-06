@@ -1,4 +1,3 @@
-// src/app/dashboard/DashboardClient.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -12,7 +11,7 @@ import {
   FaClock 
 } from "react-icons/fa";
 
-// --- Mock Data (Datos Falsos) ---
+// --- Mock Data ---
 const INITIAL_TRUCKS = [
   { id: "FTR-101", driver: "Juan P.", route: "Madrid - Valencia", temp: -18.2, status: "En Ruta", lat: 40.416, lng: -3.703 },
   { id: "FTR-104", driver: "Ana M.", route: "Barcelona - Zaragoza", temp: -20.5, status: "En Ruta", lat: 41.385, lng: 2.173 },
@@ -33,7 +32,7 @@ interface DashboardClientProps {
 export default function DashboardClient({ userName }: DashboardClientProps) {
   const [trucks, setTrucks] = useState(INITIAL_TRUCKS);
 
-  // Simulación de "Tiempo Real": Variación leve de temperatura cada 3 segundos
+  // Simulación de "Tiempo Real"
   useEffect(() => {
     const interval = setInterval(() => {
       setTrucks((current) =>
@@ -103,7 +102,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 2. Monitorización en Tiempo Real (Ocupa 1 columna) */}
+        {/* 2. Monitorización en Tiempo Real */}
         <section className="lg:col-span-1 space-y-4">
           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <FaMapMarkerAlt className="text-blue-500" /> Flota en Ruta
@@ -116,9 +115,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 relative overflow-hidden"
               >
-                {/* Indicador lateral de estado */}
                 <div className={`absolute left-0 top-0 bottom-0 w-1 ${truck.temp > -16 ? 'bg-red-500' : 'bg-emerald-500'}`} />
-                
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="font-bold text-slate-700">{truck.id}</h3>
@@ -136,7 +133,7 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
           </div>
         </section>
 
-        {/* 3. Tabla de Rutas (Ocupa 2 columnas) */}
+        {/* 3. Tabla de Rutas */}
         <section className="lg:col-span-2 space-y-4">
           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <FaClock className="text-blue-500" /> Últimas Entregas
@@ -178,10 +175,22 @@ export default function DashboardClient({ userName }: DashboardClientProps) {
   );
 }
 
-// --- Componentes Pequeños ---
+// --- Componentes Pequeños con TIPADO CORREGIDO ---
 
-function KpiCard({ title, value, icon, trend, trendColor, color, alert = false }: any) {
-  const colorClasses: any = {
+// 1. Definimos la interfaz para las props de KpiCard
+interface KpiCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  trend: string;
+  trendColor: string;
+  color: string;
+  alert?: boolean;
+}
+
+function KpiCard({ title, value, icon, trend, trendColor, color, alert = false }: KpiCardProps) {
+  // 2. Definimos el tipo para el objeto de colores
+  const colorClasses: Record<string, string> = {
     blue: "bg-blue-50 text-blue-600",
     indigo: "bg-indigo-50 text-indigo-600",
     orange: "bg-orange-50 text-orange-600",
@@ -194,7 +203,8 @@ function KpiCard({ title, value, icon, trend, trendColor, color, alert = false }
       className={`bg-white p-6 rounded-xl shadow-sm border ${alert ? 'border-red-200 ring-2 ring-red-50' : 'border-slate-100'}`}
     >
       <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
+        {/* Usamos colorClasses[color] con seguridad de tipos */}
+        <div className={`p-3 rounded-lg ${colorClasses[color] || 'bg-gray-50 text-gray-600'}`}>
           {icon}
         </div>
         {alert && <span className="animate-pulse h-3 w-3 rounded-full bg-red-500"></span>}
@@ -211,11 +221,13 @@ function KpiCard({ title, value, icon, trend, trendColor, color, alert = false }
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const styles: any = {
+  // 3. Tipado explícito para el mapa de estilos
+  const styles: Record<string, string> = {
     "En Tránsito": "bg-blue-100 text-blue-700",
     "Entregado": "bg-emerald-100 text-emerald-700",
     "Pendiente": "bg-slate-100 text-slate-700",
   };
+  
   return (
     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${styles[status] || 'bg-gray-100'}`}>
       {status}
