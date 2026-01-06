@@ -1,7 +1,7 @@
 -- user demo: email demo@finwise.dev / password: Demo123!
 INSERT INTO users (email, password_hash, name)
 VALUES (
-  'demo@finwise.dev',
+  'admin@frosttrack.dev',
   '$2y$10$ciXQX/8y7LDx1EX7H6BsSO/L9JgKtiGk//5uZcAGxg8gn9wDTN8MC', -- Nueva contraseña: "123456"
   'Demo User'
 )
