@@ -2,12 +2,13 @@
 
 import { pool } from "../../lib/db";
 import { registerSchema } from "../../lib/schemas";
+import bcrypt from "bcryptjs"; // npm i bcryptjs
 
 export async function registerAction(formData: FormData) {
   const raw = {
     name: String(formData.get("name") ?? ""),
     email: String(formData.get("email") ?? ""),
-    password: String(formData.get("password") ?? ""), 
+    password: String(formData.get("password") ?? ""),
   };
 
   const parsed = registerSchema.safeParse(raw);
@@ -27,16 +28,18 @@ export async function registerAction(formData: FormData) {
       "SELECT COUNT(*)::text AS count FROM subscribers WHERE email = $1",
       [email]
     );
-
     const count = Number(rows[0]?.count ?? 0);
     if (count > 0) {
       return { ok: false, message: "Este email ya está registrado." };
     }
 
-    // insertar CON PASSWORD
+    // Hashear la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // insertar
     await pool.query(
       "INSERT INTO subscribers (name, email, password) VALUES ($1, $2, $3)",
-      [name, email, password]
+      [name, email, hashedPassword]
     );
 
     return { ok: true, message: "Registro completado." };

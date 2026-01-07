@@ -1,85 +1,178 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import DarkModeToggle from "@/components/DarkModeToggle";
+import Link from "next/link";
+import Image from "next/image";
+import { loginAction } from "./actions";
+import styles from "./styles.module.css";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const [message, setMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Esto evita que la página se recargue
-    setLoading(true);
-    setError("");
-
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    const result = await signIn("credentials", {
-      redirect: false,
-      email,
-      password,
-    });
-
-    if (result?.error) {
-      setError("Credenciales inválidas");
-      setLoading(false);
-    } else {
-      router.push("/dashboard");
-      router.refresh();
-    }
-  };
+  // Inputs controlados
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 px-6">
-      <div className="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-8 w-full max-w-md transition-colors duration-300">
-        {/* Toggle modo oscuro */}
-        <div className="flex justify-end mb-4">
-          <DarkModeToggle />
-        </div>
-
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">
-          Iniciar sesión
-        </h1>
-
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-          <div>
-            <label className="block text-sm font-medium mb-1 text-gray-600 dark:text-gray-300">
-              Usuario
-            </label>
-            <input
-              name="email"
-              type="text"
-              title="Introduce tu nombre de usuario"
-              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1 text-gray-600 dark:text-gray-300">
-              Contraseña
-            </label>
-            <input
-              name="password"
-              type="password"
-              title="Introduce tu contraseña"
-              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100"
-            />
-          </div>
-          <button
-            disabled={loading}
-            type="submit"
-            title="Haz clic para iniciar sesión"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+    <main className={styles.wrapper}>
+      {/* HEADER */}
+      <header className={styles.topbar}>
+        <div className={styles.topbarInner}>
+          <Link
+            href="/"
+            className={styles.brand}
+            title="Ir a la página principal"
           >
-            {loading ? "Cargando..." : "Iniciar sesión"}
-          </button>
-        </form>
-      </div>
-    </div>
+            {process.env.NEXT_PUBLIC_APP_NAME ?? "FrostTrack"}
+          </Link>
+
+          <nav className={styles.topbarNav}>
+            <button
+              type="button"
+              onClick={() => router.replace("/register")}
+              className={styles.loginLink}
+              title="Crear una cuenta nueva"
+            >
+              Regístrate
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      {/* CONTENIDO SPLIT */}
+      <section className={styles.page}>
+        <div className={styles.split}>
+          {/* COLUMNA IZQUIERDA */}
+          <div className={styles.left}>
+            <Image
+              src="/images/camionIcono.png"
+              alt="Inicio de sesión"
+              title="Imagen ilustrativa del inicio de sesión"
+              width={600}
+              height={400}
+              className={styles.heroImage}
+              priority
+            />
+          </div>
+
+          {/* COLUMNA DERECHA */}
+          <div className={styles.right}>
+            <section className={styles.card} aria-labelledby="login-title">
+              <h2
+                id="login-title"
+                className={styles.title}
+                title="Formulario de inicio de sesión"
+              >
+                Iniciar sesión
+              </h2>
+
+              <form
+                className={styles.form}
+                action={(formData) => {
+                  setMessage(null);
+
+                  startTransition(async () => {
+                    const res = await loginAction(formData);
+
+                    if (!res.ok) {
+                      setMessage(
+                        res.message ?? "Correo o contraseña incorrectos."
+                      );
+                      return;
+                    }
+
+                    setMessage(res.message ?? "Inicio de sesión correcto.");
+                    setEmail("");
+                    setPassword("");
+                    router.replace("/dashboard");
+                  });
+                }}
+                noValidate
+                aria-describedby="form-desc"
+              >
+                <div id="form-desc" className={styles.srOnly}>
+                  Formulario de inicio de sesión con correo y contraseña
+                </div>
+
+                {/* EMAIL */}
+                <div className={styles.field}>
+                  <label htmlFor="email" className={styles.label}>
+                    Correo electrónico
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="tucorreo@empresa.com"
+                    className={styles.input}
+                    autoComplete="username"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+
+                {/* PASSWORD */}
+                <div className={styles.field}>
+                  <div className={styles.labelRow}>
+                    <label htmlFor="password" className={styles.label}>
+                      Contraseña
+                    </label>
+                    <Link
+                      href="/recuperar"
+                      className={styles.link}
+                      title="Recuperar contraseña"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
+
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="••••••••"
+                    className={styles.input}
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className={styles.button}
+                  disabled={pending}
+                >
+                  {pending ? "Accediendo..." : "Iniciar sesión"}
+                </button>
+              </form>
+
+              {message && (
+                <div className={styles.success} aria-live="polite">
+                  {message}
+                </div>
+              )}
+
+              <div className={styles.divider} />
+              <p className={styles.footer}>
+                ¿No tienes cuenta?{" "}
+                <button
+                  type="button"
+                  onClick={() => router.replace("/register")}
+                  className={styles.link}
+                >
+                  Regístrate
+                </button>
+              </p>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
