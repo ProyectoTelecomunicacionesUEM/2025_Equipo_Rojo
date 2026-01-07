@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image"; // <- import obligatorio
+import Image from "next/image";
 import { registerAction } from "./actions";
 import styles from "./styles.module.css";
 
@@ -17,13 +17,13 @@ export default function RegisterPage() {
   // Inputs controlados
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState(""); // 👈 NUEVO
 
   return (
     <main className={styles.wrapper}>
-      {/* HEADER (tira azul) */}
+      {/* HEADER */}
       <header className={styles.topbar}>
         <div className={styles.topbarInner}>
-          {/* Logo / Nombre de la app */}
           <Link
             href="/"
             className={styles.brand}
@@ -32,13 +32,11 @@ export default function RegisterPage() {
             {process.env.NEXT_PUBLIC_APP_NAME ?? "FrostTrack"}
           </Link>
 
-          {/* Navegación / botón login */}
           <nav className={styles.topbarNav}>
             <button
               type="button"
               onClick={() => router.replace("/login")}
               className={styles.loginLink}
-              title="Iniciar sesión en tu cuenta"
             >
               Iniciar sesión
             </button>
@@ -46,31 +44,25 @@ export default function RegisterPage() {
         </div>
       </header>
 
-      {/* CONTENIDO SPLIT */}
+      {/* CONTENIDO */}
       <section className={styles.page}>
         <div className={styles.split}>
-          {/* Columna izquierda */}
+          {/* IZQUIERDA */}
           <div className={styles.left}>
-            {/* Imagen optimizada con Next.js */}
             <Image
               src="/images/imagenRegistro.png"
               alt="Registro de usuario"
-              title="Imagen ilustrativa del registro de usuario"
-              width={600}    // ancho real de tu imagen
-              height={400}   // alto real de tu imagen
+              width={600}
+              height={400}
               className={styles.heroImage}
-              priority       // carga rápida para LCP
+              priority
             />
           </div>
 
-          {/* Columna derecha: formulario */}
+          {/* DERECHA */}
           <div className={styles.right}>
             <section className={styles.card} aria-labelledby="register-title">
-              <h2
-                id="register-title"
-                className={styles.title}
-                title="Formulario de registro"
-              >
+              <h2 id="register-title" className={styles.title}>
                 Regístrate
               </h2>
 
@@ -79,6 +71,7 @@ export default function RegisterPage() {
                 action={(formData) => {
                   setMessage(null);
                   setErrors({});
+
                   startTransition(async () => {
                     const res = await registerAction(formData);
                     if (!res.ok) {
@@ -89,85 +82,74 @@ export default function RegisterPage() {
                       return;
                     }
 
-                    setMessage(
-                      res.message ?? "Te hemos enviado un correo de confirmación."
-                    );
+                    setMessage(res.message ?? "Registro completado.");
 
-                    // Limpiar inputs tras registro correcto
+                    // Limpiar inputs
                     setName("");
                     setEmail("");
+                    setPassword("");
                   });
                 }}
                 noValidate
-                aria-describedby="form-desc"
               >
-                <div id="form-desc" className={styles.srOnly}>
-                  Formulario de registro con nombre y correo electrónico
-                </div>
-
                 {/* Nombre */}
                 <div className={styles.field}>
-                  <label
-                    htmlFor="name"
-                    className={styles.label}
-                    title="Tu nombre completo"
-                  >
+                  <label htmlFor="name" className={styles.label}>
                     Nombre
                   </label>
                   <input
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="Tu nombre"
                     className={styles.input}
-                    aria-invalid={Boolean(errors.name)}
-                    aria-describedby={errors.name ? "name-error" : undefined}
-                    autoComplete="name"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    aria-invalid={Boolean(errors.name)}
                   />
                   {errors.name && (
-                    <p
-                      id="name-error"
-                      className={styles.errorText}
-                      aria-live="polite"
-                    >
-                      {errors.name[0]}
-                    </p>
+                    <p className={styles.errorText}>{errors.name[0]}</p>
                   )}
                 </div>
 
                 {/* Email */}
                 <div className={styles.field}>
-                  <label
-                    htmlFor="email"
-                    className={styles.label}
-                    title="Tu correo electrónico"
-                  >
+                  <label htmlFor="email" className={styles.label}>
                     Correo electrónico
                   </label>
                   <input
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="tucorreo@empresa.com"
                     className={styles.input}
-                    aria-invalid={Boolean(errors.email)}
-                    aria-describedby={errors.email ? "email-error" : undefined}
-                    autoComplete="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    aria-invalid={Boolean(errors.email)}
                   />
                   {errors.email && (
-                    <p
-                      id="email-error"
-                      className={styles.errorText}
-                      aria-live="polite"
-                    >
-                      {errors.email[0]}
-                    </p>
+                    <p className={styles.errorText}>{errors.email[0]}</p>
+                  )}
+                </div>
+
+                {/* PASSWORD */}
+                <div className={styles.field}>
+                  <label htmlFor="password" className={styles.label}>
+                    Contraseña
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Mínimo 8 caracteres alfanuméricos"
+                    className={styles.input}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    aria-invalid={Boolean(errors.password)}
+                  />
+                  {errors.password && (
+                    <p className={styles.errorText}>{errors.password[0]}</p>
                   )}
                 </div>
 
@@ -175,7 +157,6 @@ export default function RegisterPage() {
                   type="submit"
                   className={styles.button}
                   disabled={pending}
-                  title="Registrarse como usuario"
                 >
                   {pending ? "Registrando..." : "Registrarse"}
                 </button>

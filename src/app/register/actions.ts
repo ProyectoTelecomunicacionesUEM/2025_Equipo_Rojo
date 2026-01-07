@@ -1,4 +1,3 @@
-
 "use server";
 
 import { pool } from "../../lib/db";
@@ -8,6 +7,7 @@ export async function registerAction(formData: FormData) {
   const raw = {
     name: String(formData.get("name") ?? ""),
     email: String(formData.get("email") ?? ""),
+    password: String(formData.get("password") ?? ""), 
   };
 
   const parsed = registerSchema.safeParse(raw);
@@ -19,7 +19,7 @@ export async function registerAction(formData: FormData) {
     };
   }
 
-  const { name, email } = parsed.data;
+  const { name, email, password } = parsed.data;
 
   try {
     // comprobar duplicado
@@ -27,15 +27,16 @@ export async function registerAction(formData: FormData) {
       "SELECT COUNT(*)::text AS count FROM subscribers WHERE email = $1",
       [email]
     );
+
     const count = Number(rows[0]?.count ?? 0);
     if (count > 0) {
       return { ok: false, message: "Este email ya está registrado." };
     }
 
-    // insertar
+    // insertar CON PASSWORD
     await pool.query(
-      "INSERT INTO subscribers (name, email) VALUES ($1, $2)",
-      [name, email]
+      "INSERT INTO subscribers (name, email, password) VALUES ($1, $2, $3)",
+      [name, email, password]
     );
 
     return { ok: true, message: "Registro completado." };
