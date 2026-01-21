@@ -1,7 +1,5 @@
-
 import type { Metadata } from "next";
-import Script from "next/script"; // ✅ Importa Script
-import { GoogleAnalytics } from "@next/third-parties/google";
+import Script from "next/script";
 import { Source_Sans_3, Manrope } from "next/font/google";
 
 import HeaderWrapper from "@/components/HeaderWrapper";
@@ -15,6 +13,7 @@ const sourceSans = Source_Sans_3({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: siteDetails.metadata.title,
   description: siteDetails.metadata.description,
+  metadataBase: new URL(siteDetails.siteUrl), // ⚡ Necesario para OG/Twitter
   openGraph: {
     title: siteDetails.metadata.title,
     description: siteDetails.metadata.description,
@@ -43,8 +42,23 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${manrope.className} ${sourceSans.className} antialiased min-h-screen flex flex-col bg-background`}>
+        
+        {/* Google Analytics sin @next/third-parties */}
         {siteDetails.googleAnalyticsId && (
-          <GoogleAnalytics gaId={siteDetails.googleAnalyticsId} />
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${siteDetails.googleAnalyticsId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${siteDetails.googleAnalyticsId}');
+              `}
+            </Script>
+          </>
         )}
 
         {/* Header */}
@@ -57,9 +71,12 @@ export default function RootLayout({
 
         {/* Footer */}
         <FooterMain />
+
+        {/* Google reCAPTCHA */}
         <Script
-        src="https://www.google.com/recaptcha/api.js"
-        strategy="afterInteractive"/>
+          src="https://www.google.com/recaptcha/api.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
