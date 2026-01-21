@@ -26,7 +26,7 @@ export default function RegisterPage() {
         <div className={styles.topbarInner}>
           <Link
             href="/"
-            className={styles.brand}
+            className={styles.topbarBrand}
             title="Ir a la página principal"
           >
             {process.env.NEXT_PUBLIC_APP_NAME ?? "FrostTrack"}

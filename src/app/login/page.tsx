@@ -7,14 +7,16 @@ import Image from "next/image";
 import { loginAction } from "./actions";
 import styles from "./styles.module.css";
 
+type Role = "user" | "admin";
+
 export default function LoginPage() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<string | null>(null);
 
-  // Inputs controlados
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<Role>("user");
 
   return (
     <main className={styles.wrapper}>
@@ -23,10 +25,10 @@ export default function LoginPage() {
         <div className={styles.topbarInner}>
           <Link
             href="/"
-            className={styles.brand}
+            className={styles.topbarBrand}
             title="Ir a la página principal"
           >
-            {process.env.NEXT_PUBLIC_APP_NAME ?? "FrostTrack"}
+            FrostTrack
           </Link>
 
           <nav className={styles.topbarNav}>
@@ -34,7 +36,6 @@ export default function LoginPage() {
               type="button"
               onClick={() => router.replace("/register")}
               className={styles.loginLink}
-              title="Crear una cuenta nueva"
             >
               Regístrate
             </button>
@@ -42,7 +43,7 @@ export default function LoginPage() {
         </div>
       </header>
 
-      {/* CONTENIDO SPLIT */}
+      {/* CONTENIDO */}
       <section className={styles.page}>
         <div className={styles.split}>
           {/* COLUMNA IZQUIERDA */}
@@ -50,44 +51,64 @@ export default function LoginPage() {
             <Image
               src="/images/camionIcono.png"
               alt="Inicio de sesión"
-              title="Imagen ilustrativa del inicio de sesión"
               width={600}
               height={400}
-              className={styles.heroImage}
               priority
             />
           </div>
 
           {/* COLUMNA DERECHA */}
-          <div className={styles.right}>
+          <section className={styles.right}>
             <section className={styles.card} aria-labelledby="login-title">
-              <h2
-                id="login-title"
-                className={styles.title}
-                title="Formulario de inicio de sesión"
-              >
+              <h2 id="login-title" className={styles.title}>
                 Iniciar sesión
               </h2>
+
+              {/* Selector de rol */}
+              <div className={styles.roleRow}>
+                <button
+                  type="button"
+                  onClick={() => setRole("user")}
+                  className={`${styles.roleBtn} ${
+                    role === "user" ? styles.roleBtnActive : ""
+                  }`}
+                  aria-pressed={role === "user"}
+                >
+                  Usuario
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRole("admin")}
+                  className={`${styles.roleBtn} ${
+                    role === "admin" ? styles.roleBtnActive : ""
+                  }`}
+                  aria-pressed={role === "admin"}
+                >
+                  Administrador
+                </button>
+              </div>
 
               <form
                 className={styles.form}
                 action={(formData) => {
                   setMessage(null);
+                  formData.set("role", role);
 
                   startTransition(async () => {
                     const res = await loginAction(formData);
 
-                    if (!res.ok) {
+                    if (!res?.ok) {
                       setMessage(
-                        res.message ?? "Correo o contraseña incorrectos."
+                        res?.message ?? "Correo o contraseña incorrectos"
                       );
                       return;
                     }
 
-                    setMessage(res.message ?? "Inicio de sesión correcto.");
                     setEmail("");
                     setPassword("");
-                    router.replace("/dashboard");
+
+                    router.replace(res?.redirectTo ?? "/dashboard");
                   });
                 }}
                 noValidate
@@ -106,10 +127,9 @@ export default function LoginPage() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="tucorreo@empresa.com"
                     className={styles.input}
-                    autoComplete="username"
                     required
+                    autoComplete="username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -121,12 +141,8 @@ export default function LoginPage() {
                     <label htmlFor="password" className={styles.label}>
                       Contraseña
                     </label>
-                    <Link
-                      href="/recuperar"
-                      className={styles.link}
-                      title="Recuperar contraseña"
-                    >
-                      ¿Olvidaste tu contraseña?
+                    <Link href="/recuperar" className={styles.link}>
+                      ¿Olvidaste la contraseña?
                     </Link>
                   </div>
 
@@ -134,21 +150,26 @@ export default function LoginPage() {
                     id="password"
                     name="password"
                     type="password"
-                    placeholder="••••••••"
                     className={styles.input}
-                    autoComplete="current-password"
                     required
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
+
+                <input type="hidden" name="role" value={role} />
 
                 <button
                   type="submit"
                   className={styles.button}
                   disabled={pending}
                 >
-                  {pending ? "Accediendo..." : "Iniciar sesión"}
+                  {pending
+                    ? "Accediendo..."
+                    : `Entrar como ${
+                        role === "admin" ? "Administrador" : "Usuario"
+                      }`}
                 </button>
               </form>
 
@@ -159,6 +180,7 @@ export default function LoginPage() {
               )}
 
               <div className={styles.divider} />
+
               <p className={styles.footer}>
                 ¿No tienes cuenta?{" "}
                 <button
@@ -170,7 +192,7 @@ export default function LoginPage() {
                 </button>
               </p>
             </section>
-          </div>
+          </section>
         </div>
       </section>
     </main>
