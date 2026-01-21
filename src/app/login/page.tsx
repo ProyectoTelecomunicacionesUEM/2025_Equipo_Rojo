@@ -49,7 +49,7 @@ export default function LoginPage() {
           {/* COLUMNA IZQUIERDA */}
           <div className={styles.left}>
             <Image
-              src="/images/camionIcono.png"
+              src="/images/camion.png"
               alt="Inicio de sesión"
               width={600}
               height={400}

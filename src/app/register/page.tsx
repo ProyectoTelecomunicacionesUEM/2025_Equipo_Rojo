@@ -50,7 +50,7 @@ export default function RegisterPage() {
           {/* IZQUIERDA */}
           <div className={styles.left}>
             <Image
-              src="/images/imagenRegistro.png"
+              src="/images/tabletTransparente.png"
               alt="Registro de usuario"
               width={600}
               height={400}

@@ -20,12 +20,24 @@
 }
 
 /* ---------- Columna izquierda ---------- */
+
+/* styles.module.css */
 .left {
   display: flex;
-  flex-direction: column;
   justify-content: center;
+  align-items: center;
   padding: 12px;
+  background: transparent; /* importante */
 }
+
+.heroImg {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  object-fit: contain;                         /* no deforma */
+  filter: drop-shadow(0 14px 30px rgba(31,87,214,.18));  /* halo pro */
+}
+
 
 .leftBrand {
   font-size: clamp(28px, 4vw, 40px);
@@ -41,14 +53,15 @@
   max-width: 520px;
 }
 
+
 .heroImg {
-  margin-top: 16px;
   width: 100%;
-  max-width: 380px;
-  border-radius: 12px;
-  object-fit: cover;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.05);
+  max-width: 520px;
+  height: auto;
+  object-fit: contain;                         /* no deforma */
+  filter: drop-shadow(0 14px 30px rgba(31,87,214,.18));  /* halo pro */
 }
+
 
 /* ---------- Columna derecha (formulario) ---------- */
 .right {
