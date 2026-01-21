@@ -163,12 +163,7 @@
 }
 
 /* ---------- Footer ---------- */
-.footer {
-  margin-top: 12px;
-  font-size: clamp(16px, 1.5vw, 20px);  /* ajusta según pantalla */
-  text-align: center;
-  color: var(--foreground-accent);
-}
+
 
 .link {
   color: var(--secondary);
