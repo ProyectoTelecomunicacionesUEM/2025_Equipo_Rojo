@@ -141,9 +141,6 @@ export default function LoginPage() {
                     <label htmlFor="password" className={styles.label}>
                       Contraseña
                     </label>
-                    <Link href="/recuperar" className={styles.link}>
-                      ¿Olvidaste la contraseña?
-                    </Link>
                   </div>
 
                   <input
