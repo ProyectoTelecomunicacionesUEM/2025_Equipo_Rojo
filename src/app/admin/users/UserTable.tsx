@@ -63,60 +63,62 @@ export default function UserTable({
     };
 
   return (
-    <div style={{ border: "1px solid #eee", borderRadius: 8, overflow: "hidden" }}>
-      {/* --- Barra compacta de filtro en la misma línea --- */}
+    <div style={{ border: "1px solid #eee", borderRadius: 8, overflow: "hidden", padding: 12 }}>
+      {/* --- Buscador y filtros --- */}
       <form
         action="/admin/users"
         method="get"
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: 6,
-          padding: 8,
-          maxWidth: 600,
-          alignItems: "center",
-        }}
+        style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12, alignItems: "center" }}
       >
         <input
           type="text"
           name="q"
           placeholder="Buscar por nombre o email"
           defaultValue={q}
-          style={{
-            flex: 1,
-            padding: "6px 10px",
-            borderRadius: 6,
-            border: "1px solid #ddd",
-            height: 36,
-          }}
+          style={{ flex: 2, minWidth: 220, border: "1px solid #ddd", borderRadius: 6, padding: "6px 10px", height: 36 }}
         />
+
         <select
           name="r"
           defaultValue={r}
-          style={{
-            padding: "6px 10px",
-            borderRadius: 6,
-            border: "1px solid #ddd",
-            height: 36,
-          }}
+          style={{ flex: 1, padding: "6px 10px", border: "1px solid #ddd", borderRadius: 6, height: 36 }}
         >
           <option value="all">Todos</option>
           <option value="admin">Admin</option>
           <option value="user">User</option>
         </select>
+
         <button
           type="submit"
           style={{
-            padding: "8px 12px",
-            borderRadius: 6,
+            flex: 1,
             background: "#0b5fff",
             color: "#fff",
             border: "none",
-            cursor: "pointer",
+            borderRadius: 6,
+            padding: "8px 12px",
             height: 36,
+            cursor: "pointer",
           }}
         >
           Buscar
+        </button>
+
+        <button
+          type="button"
+          onClick={() => (window.location.href = "/admin/users")}
+          style={{
+            flex: 1,
+            background: "#0b5fff", // azul igual que Buscar
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            padding: "8px 12px",
+            height: 36,
+            cursor: "pointer",
+          }}
+        >
+          Limpiar filtros
         </button>
       </form>
 
@@ -180,15 +182,7 @@ export default function UserTable({
       </table>
 
       {/* --- Botones debajo de la tabla --- */}
-      <div
-        style={{
-          marginTop: 12,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: 12,
-        }}
-      >
+      <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center", padding: 12 }}>
         <form style={{ display: "flex", gap: 8 }}>
           <input type="hidden" name="ids" value={idsValue} />
           <button type="submit" formAction={runAction("admin")} disabled={!selected.length || pending} style={btn}>
@@ -201,9 +195,7 @@ export default function UserTable({
             Eliminar
           </button>
         </form>
-        <div style={{ color: "#666" }}>
-          {selected.length ? `${selected.length} seleccionados` : "Nada seleccionado"}
-        </div>
+        <div style={{ color: "#666" }}>{selected.length ? `${selected.length} seleccionados` : "Nada seleccionado"}</div>
       </div>
     </div>
   );

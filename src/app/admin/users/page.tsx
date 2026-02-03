@@ -96,60 +96,7 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: a
         </Link>
       </div>
 
-      {/* Buscador: input + combo + botón en la misma línea */}
-      <form
-        action="/admin/users"
-        method="get"
-        style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 12 }}
-      >
-        <input
-          type="text"
-          name="q"
-          placeholder="Buscar por nombre o email"
-          defaultValue={qStr}
-          style={{
-            flex: 2,
-            minWidth: 220,
-            border: "1px solid #ddd",
-            borderRadius: 6,
-            padding: "6px 10px",
-            height: 36,
-          }}
-        />
-
-        <select
-          name="r"
-          defaultValue={roleFilter}
-          style={{
-            flex: 1,
-            padding: "6px 10px",
-            border: "1px solid #ddd",
-            borderRadius: 6,
-            height: 36,
-          }}
-        >
-          <option value="all">Todos</option>
-          <option value="admin">Admin</option>
-          <option value="user">User</option>
-        </select>
-
-        <button
-          type="submit"
-          style={{
-            flex: 1,
-            background: "#0b5fff",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            padding: "8px 12px",
-            height: 36,
-          }}
-        >
-          Buscar
-        </button>
-      </form>
-
-      {/* Tabla de usuarios */}
+      {/* --- Tabla de usuarios con buscador dentro de UserTable --- */}
       <UserTable rows={rows as any} page={pageNum} pageSize={take} q={qStr} r={roleFilter} />
 
       {/* Paginación */}
@@ -166,7 +113,9 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: a
           <Link href={keepQS({ page: pageNum - 1 })} style={pageBtn}>
             « Anterior
           </Link>
-          <span>Página {pageNum} de {totalPages}</span>
+          <span>
+            Página {pageNum} de {totalPages}
+          </span>
           <Link href={keepQS({ page: pageNum + 1 })} style={pageBtn}>
             Siguiente »
           </Link>
