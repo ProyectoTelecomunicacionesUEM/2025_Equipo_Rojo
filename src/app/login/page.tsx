@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { loginAction } from "./actions";
+import { signIn } from "next-auth/react";
 import styles from "./styles.module.css";
 
 type Role = "user" | "admin";
@@ -23,11 +23,7 @@ export default function LoginPage() {
       {/* HEADER */}
       <header className={styles.topbar}>
         <div className={styles.topbarInner}>
-          <Link
-            href="/"
-            className={styles.topbarBrand}
-            title="Ir a la página principal"
-          >
+          <Link href="/" className={styles.logo}>
             FrostTrack
           </Link>
 
@@ -50,8 +46,8 @@ export default function LoginPage() {
           <div className={styles.left}>
             <Image
               src="/images/camion.png"
-              alt="Inicio de sesión"
-              width={600}
+              alt="Camión"
+              width={400}
               height={400}
               priority
             />
@@ -89,26 +85,21 @@ export default function LoginPage() {
                 </button>
               </div>
 
+              {/* FORMULARIO CON signIn() */}
               <form
                 className={styles.form}
-                action={(formData) => {
+                onSubmit={(e) => {
+                  e.preventDefault();
                   setMessage(null);
-                  formData.set("role", role);
 
                   startTransition(async () => {
-                    const res = await loginAction(formData);
-
-                    if (!res?.ok) {
-                      setMessage(
-                        res?.message ?? "Correo o contraseña incorrectos"
-                      );
-                      return;
-                    }
-
-                    setEmail("");
-                    setPassword("");
-
-                    router.replace(res?.redirectTo ?? "/dashboard");
+                    await signIn("credentials", {
+                      email,
+                      password,
+                      role,
+                      redirect: true,
+                      callbackUrl: "/admin/users",
+                    });
                   });
                 }}
                 noValidate

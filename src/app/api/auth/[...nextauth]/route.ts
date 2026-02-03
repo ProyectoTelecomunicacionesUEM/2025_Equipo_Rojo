@@ -1,3 +1,9 @@
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export { GET, POST } from "@/auth";
+
+import NextAuth from "next-auth";
+import { authOptions } from "@/authOptions";
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
