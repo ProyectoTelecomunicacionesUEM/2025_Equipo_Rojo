@@ -4,7 +4,7 @@ import { pool } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
 import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
+import bcrypt from "bcryptjs"; // <--- Importamos bcrypt
 
 /** Requiere que el usuario sea admin */
 async function requireAdmin() {
@@ -59,6 +59,57 @@ async function ensureAtLeastOneAdminRemains(client: any, idsToAffect: string[]) 
   if (affectedAdmins >= totalAdmins) {
     throw new Error("No puedes dejar el sistema sin administradores.");
   }
+}
+
+/** Acción: Crear un nuevo usuario */
+export async function createUserAction(formData: FormData) {
+  await requireAdmin();
+
+  const name = formData.get("name") as string;
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string; // <--- Capturamos la clave
+  const rol = (formData.get("rol") as string) || "user";
+
+  // Validamos que la clave no venga vacía
+  if (!email || !name || !password) {
+    return { ok: false, message: "Nombre, email y contraseña son obligatorios" };
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    // Verificar si el email ya existe
+    const { rows: existing } = await client.query(
+      `SELECT id FROM public.subscribers WHERE email = $1 LIMIT 1`,
+      [email]
+    );
+
+    if (existing.length > 0) {
+      throw new Error("El correo electrónico ya está registrado.");
+    }
+
+    // --- SEGURIDAD: Hasheamos la contraseña antes de insertar ---
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Insertar nuevo registro incluyendo la columna password
+    await client.query(
+      `INSERT INTO public.subscribers (name, email, rol, activo, password, created_at) 
+       VALUES ($1, $2, $3, true, $4, NOW())`,
+      [name, email, rol, hashedPassword]
+    );
+
+    await client.query("COMMIT");
+  } catch (e: any) {
+    await client.query("ROLLBACK");
+    return { ok: false, message: e.message || "Error al crear usuario" };
+  } finally {
+    client.release();
+  }
+
+  revalidatePath("/admin/users");
+  return { ok: true, message: "Usuario creado con éxito" };
 }
 
 /** Acción: cambiar seleccionados a ADMIN */

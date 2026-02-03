@@ -140,6 +140,24 @@ export default function UserTable({
           >
             Limpiar filtros
           </button>
+<button
+  type="button"
+  onClick={() => router.push("/admin/users/new")} // ✅ Esto usa el router que ya tienes definido arriba
+  style={{ 
+    background: "var(--primary)", 
+    color: "#000", 
+    border: "none", 
+    borderRadius: 10, 
+    padding: "0 25px", 
+    height: 48, 
+    cursor: "pointer", 
+    fontWeight: 700, 
+    fontSize: "16px",
+    marginLeft: "auto" 
+  }}
+>
+  + Nuevo Usuario
+</button>
         </form>
 
         {/* Tabla */}
