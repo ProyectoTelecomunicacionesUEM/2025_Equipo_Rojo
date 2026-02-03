@@ -5,6 +5,7 @@ import { Source_Sans_3, Manrope } from "next/font/google";
 import HeaderWrapper from "@/components/HeaderWrapper";
 import FooterMain from "@/components/FooterMain";
 import { siteDetails } from "@/data/siteDetails";
+import Providers from "./providers"; // 👈 AÑADIDO
 import "./globals.css";
 
 const manrope = Manrope({ subsets: ["latin"] });
@@ -13,7 +14,7 @@ const sourceSans = Source_Sans_3({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: siteDetails.metadata.title,
   description: siteDetails.metadata.description,
-  metadataBase: new URL(siteDetails.siteUrl), // ⚡ Necesario para OG/Twitter
+  metadataBase: new URL(siteDetails.siteUrl),
   openGraph: {
     title: siteDetails.metadata.title,
     description: siteDetails.metadata.description,
@@ -41,42 +42,45 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="es">
-      <body className={`${manrope.className} ${sourceSans.className} antialiased min-h-screen flex flex-col bg-background`}>
-        
-        {/* Google Analytics sin @next/third-parties */}
-        {siteDetails.googleAnalyticsId && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${siteDetails.googleAnalyticsId}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-analytics" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${siteDetails.googleAnalyticsId}');
-              `}
-            </Script>
-          </>
-        )}
+      <body
+        className={`${manrope.className} ${sourceSans.className} antialiased min-h-screen flex flex-col bg-background`}
+      >
+        <Providers>
+          {/* Google Analytics */}
+          {siteDetails.googleAnalyticsId && (
+            <>
+              <Script
+                src={`https://www.googletagmanager.com/gtag/js?id=${siteDetails.googleAnalyticsId}`}
+                strategy="afterInteractive"
+              />
+              <Script id="google-analytics" strategy="afterInteractive">
+                {`
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${siteDetails.googleAnalyticsId}');
+                `}
+              </Script>
+            </>
+          )}
 
-        {/* Header */}
-        <HeaderWrapper />
+          {/* Header */}
+          <HeaderWrapper />
 
-        {/* Contenido principal */}
-        <main className="flex-1 flow-root">
-          {children}
-        </main>
+          {/* Contenido principal */}
+          <main className="flex-1 flow-root">
+            {children}
+          </main>
 
-        {/* Footer */}
-        <FooterMain />
+          {/* Footer */}
+          <FooterMain />
 
-        {/* Google reCAPTCHA */}
-        <Script
-          src="https://www.google.com/recaptcha/api.js"
-          strategy="afterInteractive"
-        />
+          {/* Google reCAPTCHA */}
+          <Script
+            src="https://www.google.com/recaptcha/api.js"
+            strategy="afterInteractive"
+          />
+        </Providers>
       </body>
     </html>
   );

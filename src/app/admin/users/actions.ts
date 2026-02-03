@@ -1,7 +1,6 @@
 "use server";
 
 import { pool } from "@/lib/db";
-// ❌ import { auth } from "@/auth";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
 import { revalidatePath } from "next/cache";
@@ -9,7 +8,6 @@ import { headers } from "next/headers";
 
 /** Requiere que el usuario sea admin */
 async function requireAdmin() {
-  // ❌ const session = await auth();
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {
