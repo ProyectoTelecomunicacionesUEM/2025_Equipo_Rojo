@@ -23,7 +23,7 @@ export default function LoginPage() {
       {/* HEADER */}
       <header className={styles.topbar}>
         <div className={styles.topbarInner}>
-          <Link href="/" className={styles.logo}>
+          <Link href="/" className={styles.topbarBrand}>
             FrostTrack
           </Link>
 
@@ -47,8 +47,8 @@ export default function LoginPage() {
             <Image
               src="/images/camion.png"
               alt="Camión"
-              width={400}
-              height={400}
+              width={2500}
+              height={2500}
               priority
             />
           </div>

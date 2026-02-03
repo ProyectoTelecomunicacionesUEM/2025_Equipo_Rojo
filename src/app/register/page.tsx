@@ -52,8 +52,8 @@ export default function RegisterPage() {
             <Image
               src="/images/tabletTransparente.png"
               alt="Registro de usuario"
-              width={600}
-              height={400}
+              width={2500}
+              height={2500}
               className={styles.heroImage}
               priority
             />
