@@ -75,15 +75,7 @@ export default async function AdminUsersPage(props: {
 
       {/* Filtros */}
       <nav style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
-        <Link href={createQueryString({ r: "all", page: 1 })} style={roleFilter === "all" ? tabActive : tab}>
-          Todos ({countAll})
-        </Link>
-        <Link href={createQueryString({ r: "admin", page: 1 })} style={roleFilter === "admin" ? tabActive : tab}>
-          Admins
-        </Link>
-        <Link href={createQueryString({ r: "user", page: 1 })} style={roleFilter === "user" ? tabActive : tab}>
-          Users
-        </Link>
+       
       </nav>
 
       {/* Bloque Unificado de Tabla + Paginación */}
@@ -119,12 +111,6 @@ export default async function AdminUsersPage(props: {
             </Link>
           </div>
         </footer>
-      </div>
-
-      <div style={{ marginTop: "16px" }}>
-        <Link href="/admin" style={{ color: "#0070f3", textDecoration: "none", fontSize: "13px" }}>
-          ← Volver al Panel
-        </Link>
       </div>
     </main>
   );
