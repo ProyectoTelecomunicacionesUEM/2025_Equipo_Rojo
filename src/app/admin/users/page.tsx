@@ -1,153 +1,180 @@
-// src/app/admin/users/page.tsx
 import { pool } from "@/lib/db";
 import Link from "next/link";
 import UserTable from "./UserTable";
+import type { CSSProperties } from "react";
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = {
-  page?: string;
-  pageSize?: string;
-  q?: string;
-  r?: "all" | "admin" | "user";
-};
+interface UserRow {
+  id: string;
+  name: string;
+  email: string;
+  rol: "admin" | "user";
+  activo: boolean;
+  created_at: Date;
+  total_count: number;
+}
 
-export default async function AdminUsersPage({ searchParams }: { searchParams: any }) {
-  const params = await searchParams;
-  const { page = "1", pageSize = "10", q = "", r = "all" } = params;
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
-  const pageNum = Math.max(1, Number(page) || 1);
-  const take = Math.min(50, Math.max(5, Number(pageSize) || 10));
-  const offset = (pageNum - 1) * take;
+export default async function AdminUsersPage(props: {
+  searchParams: SearchParams;
+}) {
+  const sParams = await props.searchParams;
+  const PAGE_SIZE = 10;
+  
+  const page = typeof sParams.page === "string" ? sParams.page : "1";
+  const q = typeof sParams.q === "string" ? sParams.q : "";
+  const r = typeof sParams.r === "string" ? sParams.r : "all";
 
-  const qStr = (q || "").trim();
-  const roleFilter = r === "admin" || r === "user" ? r : "all";
+  const pageNum = Math.max(1, parseInt(page) || 1);
+  const offset = (pageNum - 1) * PAGE_SIZE;
+  const roleFilter = (r === "admin" || r === "user") ? r : "all";
+  const searchQ = q.trim();
 
-  // ---- Contadores por rol ----
-  const countsSql = `
-    SELECT rol, COUNT(*)::int AS c
-    FROM public.subscribers
-    GROUP BY rol
-  `;
-  const { rows: countsRows } = await pool.query(countsSql);
-  const countAdmin = countsRows.find((x: any) => x.rol === "admin")?.c ?? 0;
-  const countUser = countsRows.find((x: any) => x.rol === "user")?.c ?? 0;
+  // Queries
+  const { rows: countsRows } = await pool.query<{ rol: string; c: number }>(
+    `SELECT rol, COUNT(*)::int AS c FROM public.subscribers GROUP BY rol`
+  );
+  const countAdmin = countsRows.find(x => x.rol === "admin")?.c ?? 0;
+  const countUser = countsRows.find(x => x.rol === "user")?.c ?? 0;
   const countAll = countAdmin + countUser;
 
-  // ---- Datos ----
-  let dataSql = `
-    SELECT id, name, email, rol, activo, created_at
+  const where: string[] = [];
+  const args: any[] = [];
+  if (roleFilter !== "all") { args.push(roleFilter); where.push(`rol = $${args.length}`); }
+  if (searchQ) { args.push(`%${searchQ}%`); where.push(`(email ILIKE $${args.length} OR name ILIKE $${args.length})`); }
+
+  const whereSql = where.length > 0 ? `WHERE ${where.join(" AND ")}` : "";
+  const dataSql = `
+    SELECT id, name, email, rol, activo, created_at, COUNT(*) OVER()::int AS total_count
     FROM public.subscribers
+    ${whereSql}
+    ORDER BY created_at DESC
+    LIMIT $${args.length + 1} OFFSET $${args.length + 2}
   `;
-  let dataParams: any[] = [];
 
-  if (roleFilter !== "all" && qStr.length > 0) {
-    dataSql += ` WHERE (email ILIKE $1 OR name ILIKE $1) AND rol = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4`;
-    dataParams = [`%${qStr}%`, roleFilter, take, offset];
-  } else if (roleFilter !== "all") {
-    dataSql += ` WHERE rol = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`;
-    dataParams = [roleFilter, take, offset];
-  } else if (qStr.length > 0) {
-    dataSql += ` WHERE email ILIKE $1 OR name ILIKE $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`;
-    dataParams = [`%${qStr}%`, take, offset];
-  } else {
-    dataSql += ` ORDER BY created_at DESC LIMIT $1 OFFSET $2`;
-    dataParams = [take, offset];
-  }
+  const { rows } = await pool.query<UserRow>(dataSql, [...args, PAGE_SIZE, offset]);
+  const totalCount = rows[0]?.total_count ?? 0;
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE) || 1;
 
-  const { rows } = await pool.query(dataSql, dataParams);
-  const totalPages = Math.max(1, Math.ceil(rows.length / take));
-
-  const keepQS = (extra: Record<string, string | number>) => {
-    const params = new URLSearchParams({
-      page: String(pageNum),
-      pageSize: String(take),
-      ...(qStr ? { q: qStr } : {}),
-      ...(roleFilter !== "all" ? { r: roleFilter } : {}),
-      ...Object.fromEntries(Object.entries(extra).map(([k, v]) => [k, String(v)])),
-    });
-    return `/admin/users?${params.toString()}`;
-  };
-
-  const tabLink = (tab: "all" | "admin" | "user") => {
-    const params = new URLSearchParams({
-      page: "1",
-      pageSize: String(take),
-      ...(qStr ? { q: qStr } : {}),
-      ...(tab !== "all" ? { r: tab } : {}),
-    });
+  const createQueryString = (overrides: Record<string, string | number | null>) => {
+    const params = new URLSearchParams();
+    params.set("page", String(pageNum));
+    if (searchQ) params.set("q", searchQ);
+    if (roleFilter !== "all") params.set("r", roleFilter);
+    Object.entries(overrides).forEach(([k, v]) => v === null ? params.delete(k) : params.set(k, String(v)));
     return `/admin/users?${params.toString()}`;
   };
 
   return (
-    <main style={{ padding: 24 }}>
-      <h2>Usuarios (Admin)</h2>
+    <main style={{ padding: "12px 20px", maxWidth: "1200px", margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
+      <header style={{ marginBottom: "12px" }}>
+        <h2 style={{ margin: 0, fontSize: "1.4rem" }}>Usuarios ({totalCount})</h2>
+      </header>
 
-      {/* Tabs por rol */}
-      <div style={{ display: "flex", gap: 8, margin: "8px 0 12px" }}>
-        <Link href={tabLink("all")} style={roleFilter === "all" ? tabActive : tab}>
+      {/* Filtros */}
+      <nav style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
+        <Link href={createQueryString({ r: "all", page: 1 })} style={roleFilter === "all" ? tabActive : tab}>
           Todos ({countAll})
         </Link>
-        <Link href={tabLink("admin")} style={roleFilter === "admin" ? tabActive : tab}>
-          Admin ({countAdmin})
+        <Link href={createQueryString({ r: "admin", page: 1 })} style={roleFilter === "admin" ? tabActive : tab}>
+          Admins
         </Link>
-        <Link href={tabLink("user")} style={roleFilter === "user" ? tabActive : tab}>
-          User ({countUser})
+        <Link href={createQueryString({ r: "user", page: 1 })} style={roleFilter === "user" ? tabActive : tab}>
+          Users
         </Link>
+      </nav>
+
+      {/* Bloque Unificado de Tabla + Paginación */}
+      <div style={unifiedContainer}>
+        {/* Aquí es donde controlas la altura máxima */}
+        <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: "750px" }}>
+          <UserTable rows={rows} page={pageNum} pageSize={PAGE_SIZE} q={searchQ} r={roleFilter} />
+        </div>
+
+        {/* Paginación pegada a la tabla */}
+        <footer style={compactFooter}>
+          <span style={{ fontSize: "12px", color: "#666" }}>
+            {rows.length} usuarios en esta página
+          </span>
+          
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <Link 
+              href={createQueryString({ page: pageNum - 1 })} 
+              style={pageNum <= 1 ? btnDisabled : pageBtn}
+            >
+              Anterior
+            </Link>
+            
+            <span style={{ fontSize: "13px", fontWeight: "600" }}>
+              {pageNum} / {totalPages}
+            </span>
+
+            <Link 
+              href={createQueryString({ page: pageNum + 1 })} 
+              style={pageNum >= totalPages ? btnDisabled : pageBtn}
+            >
+              Siguiente
+            </Link>
+          </div>
+        </footer>
       </div>
 
-      {/* --- Tabla de usuarios con buscador dentro de UserTable --- */}
-      <UserTable rows={rows as any} page={pageNum} pageSize={take} q={qStr} r={roleFilter} />
-
-      {/* Paginación */}
-      {totalPages > 1 && (
-        <nav
-          style={{
-            marginTop: 12,
-            display: "flex",
-            gap: 8,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Link href={keepQS({ page: pageNum - 1 })} style={pageBtn}>
-            « Anterior
-          </Link>
-          <span>
-            Página {pageNum} de {totalPages}
-          </span>
-          <Link href={keepQS({ page: pageNum + 1 })} style={pageBtn}>
-            Siguiente »
-          </Link>
-        </nav>
-      )}
-
-      <p style={{ marginTop: 20 }}>
-        <Link href="/admin">⬅ Volver al panel</Link>
-      </p>
+      <div style={{ marginTop: "16px" }}>
+        <Link href="/admin" style={{ color: "#0070f3", textDecoration: "none", fontSize: "13px" }}>
+          ← Volver al Panel
+        </Link>
+      </div>
     </main>
   );
 }
 
-const tab: React.CSSProperties = {
-  padding: "6px 10px",
-  border: "1px solid #ddd",
-  borderRadius: 6,
-  textDecoration: "none",
-  color: "#333",
+// --- Estilos Corregidos y Compactos ---
+const unifiedContainer: CSSProperties = {
+  backgroundColor: "#fff",
+  borderWidth: "1px",
+  borderStyle: "solid",
+  borderColor: "#e0e0e0",
+  borderRadius: "8px",
+  overflow: "hidden", // Importante para que el footer no se salga de las esquinas redondeadas
 };
 
-const tabActive: React.CSSProperties = {
-  ...tab,
-  background: "#0b5fff",
-  color: "#fff",
-  borderColor: "#0b5fff",
+const compactFooter: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "8px 12px",
+  backgroundColor: "#f9fafb",
+  borderTopWidth: "1px",
+  borderTopStyle: "solid",
+  borderTopColor: "#eee",
 };
 
-const pageBtn: React.CSSProperties = {
-  padding: "6px 10px",
-  border: "1px solid #ddd",
-  borderRadius: 6,
+const baseTab: CSSProperties = {
+  padding: "6px 12px",
+  borderRadius: "6px",
   textDecoration: "none",
+  fontSize: "13px",
+  borderWidth: "1px",
+  borderStyle: "solid",
+};
+
+const tab: CSSProperties = { ...baseTab, color: "#555", backgroundColor: "#fff", borderColor: "#e0e0e0" };
+const tabActive: CSSProperties = { ...baseTab, backgroundColor: "#000", color: "#fff", borderColor: "#000" };
+
+const pageBtn: CSSProperties = { 
+  ...baseTab, 
+  backgroundColor: "#fff", 
+  borderColor: "#ccc", 
   color: "#333",
+  padding: "4px 10px",
+  fontSize: "12px" 
+};
+
+const btnDisabled: CSSProperties = { 
+  ...pageBtn, 
+  opacity: 0.3, 
+  pointerEvents: "none", 
+  borderColor: "transparent"
 };
