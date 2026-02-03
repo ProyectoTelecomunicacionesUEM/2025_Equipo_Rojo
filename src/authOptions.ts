@@ -7,32 +7,21 @@ export const authOptions: NextAuthOptions = {
       name: "Credentials",
       credentials: {
         email: { type: "email" },
-        password: { type: "password" },
+        password: { type: "password" }
       },
       async authorize(credentials) {
         if (!credentials?.email) return null;
-
-        // 🔹 prueba: devuelve siempre admin
         return {
           id: "test-id",
           email: String(credentials.email),
-          role: "admin",
+          role: "admin" // o "user"
         };
-      },
-    }),
+      }
+    })
   ],
-
-  pages: {
-    signIn: "/login",
-  },
-
-  session: {
-    strategy: "jwt",
-  },
-
+  pages: { signIn: "/login" },
+  session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true,
-
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -42,7 +31,6 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
-
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
@@ -50,6 +38,6 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as "admin" | "user";
       }
       return session;
-    },
-  },
+    }
+  }
 };

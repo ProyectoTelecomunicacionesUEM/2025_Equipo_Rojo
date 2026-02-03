@@ -1,16 +1,21 @@
-import { auth } from "@/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/authOptions";
 import { redirect } from "next/navigation";
 
 export default async function WelcomePage() {
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user) {
     redirect("/login");
   }
 
   const { user } = session;
+
+  // user.id y user.role ya existen según tus tipos extendidos
   const userId = (user as typeof user & { id?: string | null }).id ?? "No disponible";
-  const displayName = user.name || user.email;
+
+  // user.name es opcional, usamos ?? para evitar error
+  const displayName = (user as typeof user & { name?: string | null }).name ?? user.email;
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-16 space-y-8">
@@ -30,7 +35,7 @@ export default async function WelcomePage() {
         <ul className="space-y-2 text-gray-700">
           <li>
             <span className="font-semibold">Nombre:</span>{" "}
-            {user.name ?? "Sin nombre registrado"}
+            {(user as typeof user & { name?: string | null }).name ?? "Sin nombre registrado"}
           </li>
           <li>
             <span className="font-semibold">Email:</span> {user.email}
