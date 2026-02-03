@@ -42,7 +42,7 @@ export default function UserTable({
 
   const runAction =
     (kind: "admin" | "user" | "delete") =>
-    (formData: FormData) => {
+    async (formData: FormData) => {
       formData.set("ids", idsValue);
       startTransition(async () => {
         try {
@@ -109,7 +109,7 @@ export default function UserTable({
           onClick={() => (window.location.href = "/admin/users")}
           style={{
             flex: 1,
-            background: "#0b5fff", // azul igual que Buscar
+            background: "#0b5fff",
             color: "#fff",
             border: "none",
             borderRadius: 6,
@@ -182,9 +182,9 @@ export default function UserTable({
       </table>
 
       {/* --- Botones debajo de la tabla --- */}
-      <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center", padding: 12 }}>
-        <form style={{ display: "flex", gap: 8 }}>
-          <input type="hidden" name="ids" value={idsValue} />
+      <form style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center", padding: 12 }}>
+        <input type="hidden" name="ids" value={idsValue} />
+        <div style={{ display: "flex", gap: 8 }}>
           <button type="submit" formAction={runAction("admin")} disabled={!selected.length || pending} style={btn}>
             Hacer ADMIN
           </button>
@@ -194,9 +194,9 @@ export default function UserTable({
           <button type="submit" formAction={runAction("delete")} disabled={!selected.length || pending} style={btnDanger}>
             Eliminar
           </button>
-        </form>
+        </div>
         <div style={{ color: "#666" }}>{selected.length ? `${selected.length} seleccionados` : "Nada seleccionado"}</div>
-      </div>
+      </form>
     </div>
   );
 }
