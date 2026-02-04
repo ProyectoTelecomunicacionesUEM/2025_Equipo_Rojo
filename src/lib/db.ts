@@ -10,3 +10,6 @@ export const pool = new Pool({
   connectionString,
   ssl: { rejectUnauthorized: false },
 });
+
+// AÑADE ESTO: Es un alias para que cuando busquemos 'db' lo encuentre
+export const db = pool;
