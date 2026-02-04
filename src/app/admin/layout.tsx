@@ -1,46 +1,110 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import { signOut, useSession } from "next-auth/react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  // 1. Obtenemos el estado de la sesión
   const { data: session, status } = useSession();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // 🔍 LOG DE DIAGNÓSTICO: Esto te dirá la verdad en la consola (F12)
-  console.log("DEBUG SESIÓN:", session);
-
-  // 2. Mientras se comprueba quién eres, no mostramos nada para evitar errores visuales
   if (status === "loading") {
-    return <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: "#1a1a1a", color: "white" }}>Cargando panel...</div>;
+    return <div style={loadingStyle}>Cargando panel...</div>;
   }
 
-  // 3. Verificamos el rol que viene de tu base de datos (Neon)
   const userRole = session?.user?.role;
   const isAdmin = userRole === "admin";
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="admin-container">
+      <style>{`
+        :root {
+          --sidebar-width: 250px;
+        }
+
+        .admin-container {
+          display: flex;
+          min-h-screen;
+        }
+
+        /* BARRA LATERAL RESPONSIVA */
+        .sidebar {
+          width: var(--sidebar-width);
+          background: #1a1a1a;
+          color: white;
+          padding: 20px;
+          position: fixed;
+          height: 100vh;
+          z-index: 1000;
+          transition: transform 0.3s ease;
+        }
+
+        /* CONTENIDO PRINCIPAL RESPONSIVO */
+        .main-wrapper {
+          flex: 1;
+          margin-left: var(--sidebar-width);
+          display: flex;
+          flex-direction: column;
+          min-width: 0; /* Evita desbordamiento de hijos */
+        }
+
+        .header-admin {
+          height: 70px;
+          background: var(--bg-card);
+          border-bottom: 1px solid var(--border-color);
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          padding: 0 20px;
+          gap: 15px;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+
+        .btn-menu-toggle {
+          display: none;
+          background: #2a2a2a;
+          color: white;
+          border: none;
+          padding: 8px 12px;
+          border-radius: 6px;
+          cursor: pointer;
+          margin-right: auto;
+        }
+
+        /* MEDIA QUERIES PARA MÓVIL */
+        @media (max-width: 768px) {
+          .sidebar {
+            transform: translateX(${isMobileMenuOpen ? "0" : "-100%"});
+          }
+          .main-wrapper {
+            margin-left: 0;
+          }
+          .btn-menu-toggle {
+            display: block;
+          }
+        }
+      `}</style>
+
       {/* BARRA LATERAL */}
-      <nav style={{ width: "250px", background: "#1a1a1a", color: "white", padding: "20px", position: "fixed", height: "100vh", zIndex: 1000 }}>
-        <h2 style={{ fontSize: "1.2rem", marginBottom: "30px" }}>🚚 Control Frío</h2>
+      <nav className="sidebar">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+          <h2 style={{ fontSize: "1.2rem", margin: 0 }}>🚚 Control Frío</h2>
+          <button className="btn-menu-toggle" onClick={() => setIsMobileMenuOpen(false)} style={{ margin: 0 }}>✕</button>
+        </div>
         
-        <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          {/* Opción universal: Todos la ven */}
-          <Link href="/admin" style={linkStyle}>🏠 Inicio (Dashboard)</Link>
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <Link href="/admin" style={linkStyle} onClick={() => setIsMobileMenuOpen(false)}>🏠 Inicio (Dashboard)</Link>
           
-          {/* BLOQUE RESTRINGIDO: Solo si el rol es exactamente 'admin' */}
           {isAdmin ? (
             <>
-              <div style={{ borderTop: "1px solid #333", marginTop: "10px", paddingTop: "10px", fontSize: "11px", color: "#888", fontWeight: "bold" }}>
-                ZONA DE ADMINISTRACIÓN
-              </div>
-              <Link href="/admin/users" style={linkStyle}>👥 Gestionar Usuarios</Link>
-              <Link href="/admin/devices" style={linkStyle}>📦 Estado de Flota</Link>
+              <div style={sectionTitleStyle}>ZONA DE ADMINISTRACIÓN</div>
+              <Link href="/admin/users" style={linkStyle} onClick={() => setIsMobileMenuOpen(false)}>👥 Gestionar Usuarios</Link>
+              <Link href="/admin/devices" style={linkStyle} onClick={() => setIsMobileMenuOpen(false)}>📦 Estado de Flota</Link>
             </>
           ) : (
-            /* Mensaje para el usuario estándar */
             <div style={{ borderTop: "1px solid #333", marginTop: "10px", paddingTop: "10px", fontSize: "11px", color: "#52c41a" }}>
               VISTA DE USUARIO ACTIVA
             </div>
@@ -49,30 +113,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </nav>
 
       {/* CONTENIDO PRINCIPAL */}
-      <div style={{ flex: 1, marginLeft: "250px", display: "flex", flexDirection: "column" }}>
-        <header style={headerStyle}>
+      <div className="main-wrapper">
+        <header className="header-admin">
+          {/* Botón Hamburguesa */}
+          <button className="btn-menu-toggle" onClick={() => setIsMobileMenuOpen(true)}>
+            ☰ Menú
+          </button>
+
           <DarkModeToggle />
           
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-            <span style={{ color: "var(--foreground)", fontSize: "13px", fontWeight: 700 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", overflow: "hidden" }}>
+            <span style={{ color: "var(--foreground)", fontSize: "12px", fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "150px" }}>
               {session?.user?.email}
             </span>
-            {/* Indicador de Rol dinámico */}
-               <span style={{ 
-              // Azul intenso para Admin, Verde oscuro para Usuario
+            <span style={{ 
               color: isAdmin ? "#0052cc" : "#065f46", 
-              fontSize: "11px", 
+              fontSize: "10px", 
               fontWeight: 800, 
               textTransform: "uppercase",
-              // Fondos suaves que combinan con el texto
               background: isAdmin ? "#e6f0ff" : "#ecfdf5",
-              padding: "4px 10px",
-              borderRadius: "6px",
-              marginTop: "4px",
-              display: "inline-block",
-              // Borde sutil para dar definición
+              padding: "2px 8px",
+              borderRadius: "4px",
+              marginTop: "2px",
               border: isAdmin ? "1px solid #b3d4ff" : "1px solid #a7f3d0",
-              letterSpacing: "0.5px"
             }}>
               {isAdmin ? "Administrador" : "Usuario"}
             </span>
@@ -83,14 +146,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
         </header>
 
-        <main style={{ flex: 1, background: "var(--background)", color: "var(--foreground)", padding: "30px" }}>
+        <main style={{ flex: 1, background: "var(--background)", color: "var(--foreground)", padding: "20px" }}>
           {children}
         </main>
+
+        {/* FOOTER INTEGRADO */}
+        <footer style={footerStyle}>
+           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', alignItems: 'center' }}>
+             <span>soporte@frosttrack.com</span>
+             <span>|</span>
+             <span>612345678</span>
+             <div style={{ fontSize: '12px', opacity: 0.8, width: '100%', textAlign: 'center', marginTop: '10px' }}>
+               © 2026 FrostTrack. Todos los derechos reservados.
+             </div>
+           </div>
+        </footer>
       </div>
     </div>
   );
 }
 
-const linkStyle = { color: "white", textDecoration: "none", padding: "12px", borderRadius: "6px", background: "#2a2a2a", fontSize: "14px", transition: "background 0.2s" };
-const headerStyle: React.CSSProperties = { height: "70px", background: "var(--bg-card)", borderBottom: "1px solid var(--border-color)", display: "flex", justifyContent: "flex-end", alignItems: "center", padding: "0 30px", gap: "20px", position: "sticky", top: 0, zIndex: 100 };
-const btnLogOut = { background: "#ff4d4f", color: "#fff", border: "none", borderRadius: "8px", padding: "10px 20px", cursor: "pointer", fontWeight: 700, fontSize: "14px" };
+// ESTILOS DE APOYO
+const linkStyle = { color: "white", textDecoration: "none", padding: "12px", borderRadius: "6px", background: "#2a2a2a", fontSize: "14px", display: "block" };
+const sectionTitleStyle = { borderTop: "1px solid #333", marginTop: "10px", paddingTop: "10px", fontSize: "11px", color: "#888", fontWeight: "bold" };
+const btnLogOut = { background: "#ff4d4f", color: "#fff", border: "none", borderRadius: "8px", padding: "8px 15px", cursor: "pointer", fontWeight: 700, fontSize: "12px" };
+const loadingStyle: React.CSSProperties = { display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", background: "#1a1a1a", color: "white" };
+const footerStyle: React.CSSProperties = { background: "#2563eb", color: "white", padding: "20px", textAlign: "center" };

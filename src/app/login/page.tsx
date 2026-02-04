@@ -60,7 +60,7 @@ export default function LoginPage() {
                 Iniciar sesión
               </h2>
 
-              {/* Selector de rol */}
+              {/* Selector de rol (solo UI) */}
               <div className={styles.roleRow}>
                 <button
                   type="button"
@@ -85,7 +85,7 @@ export default function LoginPage() {
                 </button>
               </div>
 
-              {/* FORMULARIO CON signIn() */}
+              {/* FORMULARIO */}
               <form
                 className={styles.form}
                 onSubmit={(e) => {
@@ -93,22 +93,26 @@ export default function LoginPage() {
                   setMessage(null);
 
                   startTransition(async () => {
-                    await signIn("credentials", {
+                    const res = await signIn("credentials", {
                       email,
                       password,
-                      role,
-                      redirect: true,
-                      callbackUrl: "/admin/users",
+                      redirect: false, // 👈 importante
                     });
+
+                    if (res?.ok) {
+                      // 🔥 REDIRECCIÓN SEGÚN ROL
+                      if (role === "admin") {
+                        router.replace("/admin");
+                      } else {
+                        router.replace("/dashboard");
+                      }
+                    } else {
+                      setMessage("Credenciales incorrectas");
+                    }
                   });
                 }}
                 noValidate
-                aria-describedby="form-desc"
               >
-                <div id="form-desc" className={styles.srOnly}>
-                  Formulario de inicio de sesión con correo y contraseña
-                </div>
-
                 {/* EMAIL */}
                 <div className={styles.field}>
                   <label htmlFor="email" className={styles.label}>
@@ -116,7 +120,6 @@ export default function LoginPage() {
                   </label>
                   <input
                     id="email"
-                    name="email"
                     type="email"
                     className={styles.input}
                     required
@@ -128,15 +131,11 @@ export default function LoginPage() {
 
                 {/* PASSWORD */}
                 <div className={styles.field}>
-                  <div className={styles.labelRow}>
-                    <label htmlFor="password" className={styles.label}>
-                      Contraseña
-                    </label>
-                  </div>
-
+                  <label htmlFor="password" className={styles.label}>
+                    Contraseña
+                  </label>
                   <input
                     id="password"
-                    name="password"
                     type="password"
                     className={styles.input}
                     required
@@ -145,8 +144,6 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-
-                <input type="hidden" name="role" value={role} />
 
                 <button
                   type="submit"

@@ -52,15 +52,6 @@ export default async function AdminDashboard({
 
   return (
     <div key={currentPage} style={containerStyle}>
-      {/* HEADER RESPONSIVE */}
-      <header style={headerStyle}>
-        <div>
-          <h1 style={titleStyle}>Panel de Control</h1>
-          <p style={subtitleStyle}>Admin: {session.user.email}</p>
-        </div>
-        <div style={badgeStyle}>Modo Administrador</div>
-      </header>
-
       {/* CARDS CON GRID AUTO-ADAPTABLE */}
       <div style={gridResponsiveStyle}>
         <div style={cardStyle}>

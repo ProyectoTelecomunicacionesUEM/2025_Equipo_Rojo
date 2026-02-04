@@ -30,41 +30,80 @@ export default function NewUserPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--background)", padding: "40px 20px" }}>
+    <div className="new-user-container">
+      <style>{`
+        .new-user-container {
+          min-height: 100vh;
+          background: var(--background);
+          padding: 20px; /* Reducido para móvil */
+        }
+        
+        .form-card {
+          background: var(--bg-card);
+          padding: 40px;
+          border-radius: 20px;
+          border: 1px solid var(--border-color);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .button-group {
+          margin-top: 20px;
+          display: flex;
+          gap: 10px;
+        }
+
+        /* AJUSTES PARA MÓVIL */
+        @media (max-width: 600px) {
+          .new-user-container {
+            padding: 10px;
+          }
+          .form-card {
+            padding: 20px; /* Menos espacio interno en móvil */
+          }
+          .button-group {
+            flex-direction: column; /* Botones uno arriba del otro */
+          }
+          h1 {
+            font-size: 22px !important;
+          }
+        }
+      `}</style>
+
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
         
-        {/* BOTÓN VOLVER ATRÁS - FORZADO */}
-<div style={{ marginBottom: "20px" }}>
-  <a 
-    href="/admin/users" 
-    style={{ 
-      display: "inline-flex", 
-      alignItems: "center",
-      gap: "8px",
-      color: "var(--text-muted)", 
-      textDecoration: "none", 
-      fontSize: "16px",
-      fontWeight: 600,
-      cursor: "pointer",
-      padding: "10px 0", // Área de clic más alta
-      position: "relative",
-      zIndex: 999 // Nos aseguramos de que esté por encima de todo
-    }}
-  >
-    <span style={{ fontSize: "20px" }}>←</span> Volver a la lista
-  </a>
-</div>
+        {/* BOTÓN VOLVER ATRÁS */}
+        <div style={{ marginBottom: "15px" }}>
+          <a 
+            href="/admin/users" 
+            style={{ 
+              display: "inline-flex", 
+              alignItems: "center",
+              gap: "8px",
+              color: "var(--text-muted)", 
+              textDecoration: "none", 
+              fontSize: "14px",
+              fontWeight: 600,
+              padding: "10px 0"
+            }}
+          >
+            <span style={{ fontSize: "18px" }}>←</span> Volver a la lista
+          </a>
+        </div>
 
-        <div style={{ background: "var(--bg-card)", padding: "40px", borderRadius: "20px", border: "1px solid var(--border-color)", boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}>
-          <h1 style={{ color: "var(--foreground)", marginBottom: "30px", fontSize: "28px" }}>Dar de alta nuevo usuario</h1>
+        <div className="form-card">
+          <h1 style={{ color: "var(--foreground)", marginBottom: "25px", fontSize: "28px", fontWeight: "bold" }}>
+            Dar de alta nuevo usuario
+          </h1>
           
           {error && (
-            <div style={{ background: "#ff4d4f22", color: "#ff4d4f", padding: "15px", borderRadius: "10px", marginBottom: "20px", fontWeight: 600, border: "1px solid #ff4d4f" }}>
+            <div style={{ background: "#ff4d4f22", color: "#ff4d4f", padding: "15px", borderRadius: "10px", marginBottom: "20px", fontWeight: 600, border: "1px solid #ff4d4f", fontSize: "14px" }}>
               ⚠️ {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
             
             <div>
               <label style={labelStyle}>Nombre Completo</label>
@@ -76,7 +115,7 @@ export default function NewUserPage() {
               <input name="email" type="email" required placeholder="correo@ejemplo.com" style={inputStyle} />
             </div>
 
-            <div style={{ position: "relative" }}>
+            <div>
               <label style={labelStyle}>Contraseña Inicial</label>
               <div style={{ position: "relative" }}>
                 <input 
@@ -97,13 +136,13 @@ export default function NewUserPage() {
 
             <div>
               <label style={labelStyle}>Rol del Usuario</label>
-              <select name="rol" style={inputStyle}>
+              <select name="rol" style={{...inputStyle, appearance: "none"}}>
                 <option value="user">Usuario (User)</option>
                 <option value="admin">Administrador (Admin)</option>
               </select>
             </div>
 
-            <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+            <div className="button-group">
               <button 
                 type="submit" 
                 disabled={loading} 
@@ -119,8 +158,7 @@ export default function NewUserPage() {
                   textDecoration: "none", 
                   display: "flex", 
                   alignItems: "center", 
-                  justifyContent: "center",
-                  textAlign: "center"
+                  justifyContent: "center"
                 }}
               >
                 Cancelar
@@ -133,8 +171,8 @@ export default function NewUserPage() {
   );
 }
 
-const labelStyle: React.CSSProperties = { display: "block", marginBottom: "8px", fontWeight: 600, color: "var(--foreground)", fontSize: "16px" };
-const inputStyle: React.CSSProperties = { width: "100%", height: "50px", padding: "0 15px", borderRadius: "10px", border: "1px solid var(--border-color)", background: "var(--background)", color: "var(--foreground)", fontSize: "16px", boxSizing: "border-box" };
-const btnSave: React.CSSProperties = { flex: 2, height: "55px", background: "#0b5fff", color: "#fff", border: "none", borderRadius: "12px", fontSize: "18px", fontWeight: 700, cursor: "pointer" };
-const btnCancel: React.CSSProperties = { flex: 1, height: "55px", background: "transparent", color: "var(--foreground)", border: "2px solid var(--border-color)", borderRadius: "12px", fontSize: "16px", fontWeight: 600, cursor: "pointer" };
-const eyeButtonStyle: React.CSSProperties = { position: "absolute", right: "15px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: "20px", zIndex: 10 };
+const labelStyle: React.CSSProperties = { display: "block", marginBottom: "6px", fontWeight: 600, color: "var(--foreground)", fontSize: "14px" };
+const inputStyle: React.CSSProperties = { width: "100%", height: "48px", padding: "0 15px", borderRadius: "10px", border: "1px solid var(--border-color)", background: "var(--background)", color: "var(--foreground)", fontSize: "16px", boxSizing: "border-box" };
+const btnSave: React.CSSProperties = { flex: 2, minHeight: "50px", background: "#0b5fff", color: "#fff", border: "none", borderRadius: "12px", fontSize: "16px", fontWeight: 700, cursor: "pointer" };
+const btnCancel: React.CSSProperties = { flex: 1, minHeight: "50px", background: "transparent", color: "var(--foreground)", border: "1px solid var(--border-color)", borderRadius: "12px", fontSize: "15px", fontWeight: 600, cursor: "pointer" };
+const eyeButtonStyle: React.CSSProperties = { position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", fontSize: "18px", zIndex: 10 };
