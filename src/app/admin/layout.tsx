@@ -58,17 +58,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {session?.user?.email}
             </span>
             {/* Indicador de Rol dinámico */}
-            <span style={{ 
-              color: isAdmin ? "#fadb14" : "#52c41a", 
+               <span style={{ 
+              // Azul intenso para Admin, Verde oscuro para Usuario
+              color: isAdmin ? "#0052cc" : "#065f46", 
               fontSize: "11px", 
               fontWeight: 800, 
               textTransform: "uppercase",
-              background: isAdmin ? "rgba(250, 220, 20, 0.1)" : "rgba(82, 196, 26, 0.1)",
-              padding: "2px 8px",
-              borderRadius: "4px",
-              marginTop: "4px"
+              // Fondos suaves que combinan con el texto
+              background: isAdmin ? "#e6f0ff" : "#ecfdf5",
+              padding: "4px 10px",
+              borderRadius: "6px",
+              marginTop: "4px",
+              display: "inline-block",
+              // Borde sutil para dar definición
+              border: isAdmin ? "1px solid #b3d4ff" : "1px solid #a7f3d0",
+              letterSpacing: "0.5px"
             }}>
-              {isAdmin ? "Administrador" : "Usuario Estándar"}
+              {isAdmin ? "Administrador" : "Usuario"}
             </span>
           </div>
           
