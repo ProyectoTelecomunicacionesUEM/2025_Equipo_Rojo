@@ -1,7 +1,7 @@
 import { pool } from "@/lib/db";
 import Link from "next/link";
 import UserTable from "./UserTable";
-import type { CSSProperties } from "react";
+import { CSSProperties } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -32,13 +32,9 @@ export default async function AdminUsersPage(props: {
   const roleFilter = (r === "admin" || r === "user") ? r : "all";
   const searchQ = q.trim();
 
-  // Queries
   const { rows: countsRows } = await pool.query<{ rol: string; c: number }>(
     `SELECT rol, COUNT(*)::int AS c FROM public.subscribers GROUP BY rol`
   );
-  const countAdmin = countsRows.find(x => x.rol === "admin")?.c ?? 0;
-  const countUser = countsRows.find(x => x.rol === "user")?.c ?? 0;
-  const countAll = countAdmin + countUser;
 
   const where: string[] = [];
   const args: any[] = [];
@@ -68,30 +64,29 @@ export default async function AdminUsersPage(props: {
   };
 
   return (
-    <main style={{ padding: "12px 20px", maxWidth: "1200px", margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
-      <header style={{ marginBottom: "12px" }}>
-        <h2 style={{ margin: 0, fontSize: "1.4rem" }}>Usuarios ({totalCount})</h2>
-      </header>
+    /* HE QUITADO:
+       1. La etiqueta <main> (Ya está en el Layout)
+       2. El <header> con estilos de color (Ya está en el Layout)
+       3. El botón de cerrar sesión y el email (Ya están en el Layout)
+    */
+    <div style={{ width: "100%", padding: "0" }}>
+      <div style={{ marginBottom: "20px" }}>
+        <h2 style={{ margin: 0, fontSize: "1.8rem", fontWeight: "bold" }}>
+          Usuarios ({totalCount})
+        </h2>
+      </div>
 
-      {/* Filtros */}
-      <nav style={{ display: "flex", gap: "6px", marginBottom: "12px" }}>
-       
-      </nav>
-
-      {/* Bloque Unificado de Tabla + Paginación */}
       <div style={unifiedContainer}>
-        {/* Aquí es donde controlas la altura máxima */}
-        <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: "750px" }}>
+        <div style={{ overflowX: "auto" }}>
           <UserTable rows={rows} page={pageNum} pageSize={PAGE_SIZE} q={searchQ} r={roleFilter} />
         </div>
 
-        {/* Paginación pegada a la tabla */}
         <footer style={compactFooter}>
-          <span style={{ fontSize: "12px", color: "#666" }}>
-            {rows.length} usuarios en esta página
+          <span style={{ fontSize: "13px", color: "#666" }}>
+            {rows.length} usuarios mostrados
           </span>
           
-          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
             <Link 
               href={createQueryString({ page: pageNum - 1 })} 
               style={pageNum <= 1 ? btnDisabled : pageBtn}
@@ -99,7 +94,7 @@ export default async function AdminUsersPage(props: {
               Anterior
             </Link>
             
-            <span style={{ fontSize: "13px", fontWeight: "600" }}>
+            <span style={{ fontSize: "13px", fontWeight: "700" }}>
               {pageNum} / {totalPages}
             </span>
 
@@ -112,55 +107,41 @@ export default async function AdminUsersPage(props: {
           </div>
         </footer>
       </div>
-    </main>
+    </div>
   );
 }
 
-// --- Estilos Corregidos y Compactos ---
+// Estilos que NO chocan con el Layout
 const unifiedContainer: CSSProperties = {
-  backgroundColor: "#fff",
-  borderWidth: "1px",
-  borderStyle: "solid",
-  borderColor: "#e0e0e0",
-  borderRadius: "8px",
-  overflow: "hidden", // Importante para que el footer no se salga de las esquinas redondeadas
+  backgroundColor: "var(--bg-card)",
+  borderRadius: "12px",
+  border: "1px solid var(--border-color)",
+  overflow: "hidden",
 };
 
 const compactFooter: CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: "8px 12px",
-  backgroundColor: "#f9fafb",
-  borderTopWidth: "1px",
-  borderTopStyle: "solid",
-  borderTopColor: "#eee",
+  padding: "12px 20px",
+  backgroundColor: "rgba(0,0,0,0.02)",
+  borderTop: "1px solid var(--border-color)",
 };
-
-const baseTab: CSSProperties = {
-  padding: "6px 12px",
-  borderRadius: "6px",
-  textDecoration: "none",
-  fontSize: "13px",
-  borderWidth: "1px",
-  borderStyle: "solid",
-};
-
-const tab: CSSProperties = { ...baseTab, color: "#555", backgroundColor: "#fff", borderColor: "#e0e0e0" };
-const tabActive: CSSProperties = { ...baseTab, backgroundColor: "#000", color: "#fff", borderColor: "#000" };
 
 const pageBtn: CSSProperties = { 
-  ...baseTab, 
+  padding: "6px 14px", 
   backgroundColor: "#fff", 
-  borderColor: "#ccc", 
-  color: "#333",
-  padding: "4px 10px",
-  fontSize: "12px" 
+  border: "1px solid #ddd", 
+  borderRadius: "6px", 
+  color: "#333", 
+  textDecoration: "none", 
+  fontSize: "12px",
+  fontWeight: "bold"
 };
 
 const btnDisabled: CSSProperties = { 
   ...pageBtn, 
-  opacity: 0.3, 
-  pointerEvents: "none", 
-  borderColor: "transparent"
+  opacity: 0.4, 
+  pointerEvents: "none",
+  backgroundColor: "#f5f5f5"
 };

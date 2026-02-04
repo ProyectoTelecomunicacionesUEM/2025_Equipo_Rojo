@@ -2,9 +2,8 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { deleteUsersAction, makeAdminsAction, makeUsersAction } from "./actions";
-import DarkModeToggle from "@/components/DarkModeToggle";
 
 type Row = {
   id: string;
@@ -66,49 +65,13 @@ export default function UserTable({
     };
 
   return (
-    <div style={{ 
-      position: "relative", 
-      minHeight: "100vh", 
-      backgroundColor: "var(--background)", 
-      color: "var(--foreground)",
-      transition: "background-color 0.3s ease" 
-    }}>
+    /* 1. QUITAMOS el div de pantalla completa (minHeight, position relative, etc) */
+    <div style={{ width: "100%" }}>
       
-      {/* --- Barra superior --- */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          right: 0,
-          left: 0,
-          height: 60,
-          background: "var(--bg-card)",
-          borderBottom: "1px solid var(--border-color)",
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          padding: "0 20px",
-          zIndex: 1000,
-          gap: "15px"
-        }}
-      >
-        <DarkModeToggle />
-        
-        {session?.user?.email && (
-          <span style={{ fontWeight: 600, color: "var(--foreground)", fontSize: "16px" }}>
-            {session.user.email}
-          </span>
-        )}
-        <button
-          onClick={() => signOut({ callbackUrl: "/login" })}
-          style={btnLogOut}
-        >
-          Cerrar sesión
-        </button>
-      </div>
+      {/* 2. BORRADA LA BARRA SUPERIOR (Ya la pone el Layout) */}
 
-      {/* --- Contenido --- */}
-      <div style={{ paddingTop: 90, padding: "20px 40px 120px 40px" }}>
+      {/* 3. CONTENIDO: Quitamos el padding excesivo y el paddingTop de 90px */}
+      <div style={{ padding: "0 0 120px 0" }}>
         
         {/* Filtros */}
         <form
@@ -140,34 +103,18 @@ export default function UserTable({
           >
             Limpiar filtros
           </button>
-<button
-  type="button"
-  onClick={() => router.push("/admin/users/new")} // ✅ Esto usa el router que ya tienes definido arriba
-  style={{ 
-    background: "var(--primary)", 
-    color: "#000", 
-    border: "none", 
-    borderRadius: 10, 
-    padding: "0 25px", 
-    height: 48, 
-    cursor: "pointer", 
-    fontWeight: 700, 
-    fontSize: "16px",
-    marginLeft: "auto" 
-  }}
->
-  + Nuevo Usuario
-</button>
+          
+          <button
+            type="button"
+            onClick={() => router.push("/admin/users/new")}
+            style={btnNewUser}
+          >
+            + Nuevo Usuario
+          </button>
         </form>
 
         {/* Tabla */}
-        <div style={{ 
-          background: "var(--bg-card)", 
-          borderRadius: 16, 
-          border: "1px solid var(--border-color)", 
-          overflow: "hidden",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
-        }}>
+        <div style={tableContainer}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "var(--background)", borderBottom: "2px solid var(--border-color)" }}>
@@ -212,14 +159,13 @@ export default function UserTable({
                       <td style={td}>{u.email}</td>
                       <td style={td}>
                         <span style={{
-                            padding: "6px 14px",
+                            padding: "4px 12px",
                             borderRadius: 20,
-                            background: u.rol === "admin" ? "var(--primary)" : "var(--background)",
+                            background: u.rol === "admin" ? "var(--primary)" : "rgba(0,0,0,0.05)",
                             color: u.rol === "admin" ? "#000" : "var(--foreground)",
-                            fontWeight: 800,
-                            fontSize: 12,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.5px"
+                            fontWeight: 700,
+                            fontSize: 11,
+                            textTransform: "uppercase"
                         }}>
                           {u.rol}
                         </span>
@@ -234,98 +180,66 @@ export default function UserTable({
           </table>
         </div>
 
-        {/* --- BARRA DE ACCIONES FLOTANTE --- */}
-        <form
-          style={{
-            position: "sticky",
-            bottom: "30px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "20px 30px",
-            background: "var(--bg-card)",
-            borderRadius: "20px",
-            border: "1px solid var(--border-color)",
-            boxShadow: "0 15px 40px rgba(0,0,0,0.25)",
-            zIndex: 900,
-            marginTop: 40
-          }}
-        >
-          <input type="hidden" name="ids" value={idsValue} />
-          <div style={{ display: "flex", gap: 15 }}>
-            <button 
-              type="submit" 
-              formAction={runAction("admin")} 
-              disabled={!selected.length || pending} 
-              style={{ ...btnAction, background: "#0b5fff", opacity: selected.length ? 1 : 0.4 }}
-            >
-              Hacer ADMIN
-            </button>
-            <button 
-              type="submit" 
-              formAction={runAction("user")} 
-              disabled={!selected.length || pending} 
-              style={{ ...btnAction, background: "#0b5fff", opacity: selected.length ? 1 : 0.4 }}
-            >
-              Hacer USER
-            </button>
-            <button 
-              type="submit" 
-              formAction={runAction("delete")} 
-              disabled={!selected.length || pending} 
-              style={{ ...btnAction, background: "#ff4d4f", opacity: selected.length ? 1 : 0.4 }}
-            >
-              Eliminar
-            </button>
-          </div>
-          <div style={{ color: "var(--foreground)", fontWeight: 800, fontSize: "18px" }}>
-            {selected.length === 0 ? "Selecciona usuarios" : `🔥 ${selected.length} seleccionados`}
-          </div>
-        </form>
+        {/* BARRA DE ACCIONES FLOTANTE */}
+        {selected.length > 0 && (
+          <form
+            style={floatingActions}
+          >
+            <input type="hidden" name="ids" value={idsValue} />
+            <div style={{ display: "flex", gap: 15 }}>
+              <button type="submit" formAction={runAction("admin")} disabled={pending} style={{ ...btnAction, background: "#0b5fff" }}>
+                Hacer ADMIN
+              </button>
+              <button type="submit" formAction={runAction("user")} disabled={pending} style={{ ...btnAction, background: "#0b5fff" }}>
+                Hacer USER
+              </button>
+              <button type="submit" formAction={runAction("delete")} disabled={pending} style={{ ...btnAction, background: "#ff4d4f" }}>
+                Eliminar
+              </button>
+            </div>
+            <div style={{ color: "var(--foreground)", fontWeight: 800, fontSize: "18px" }}>
+              🔥 {selected.length} seleccionados
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
 }
 
-// ESTILOS DE FUENTE GRANDE
-const th: React.CSSProperties = { 
-  padding: "18px 15px", 
-  textAlign: "left", 
-  fontSize: "15px", 
-  color: "var(--text-muted)", 
-  textTransform: "uppercase",
-  letterSpacing: "1px"
-};
-
-const td: React.CSSProperties = { 
-  padding: "20px 15px", 
-  fontSize: "17px" // <--- AQUÍ SUBIMOS EL TEXTO DE LA TABLA
-};
-
-const filterInput: React.CSSProperties = { 
-  flex: 2, 
-  minWidth: 250, 
+// ESTILOS LIMPIOS
+const tableContainer: React.CSSProperties = { 
+  background: "var(--bg-card)", 
+  borderRadius: 16, 
   border: "1px solid var(--border-color)", 
-  borderRadius: 10, 
-  padding: "0 15px", 
-  height: 48,
-  fontSize: "16px",
-  background: "var(--bg-card)",
-  color: "var(--foreground)"
+  overflow: "hidden",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
 };
 
-const filterSelect: React.CSSProperties = { 
-  flex: 1, 
-  padding: "0 10px", 
-  border: "1px solid var(--border-color)", 
-  borderRadius: 10, 
-  height: 48,
-  fontSize: "16px",
-  background: "var(--bg-card)",
-  color: "var(--foreground)"
-};
+const th: React.CSSProperties = { padding: "18px 15px", textAlign: "left", fontSize: "13px", color: "var(--text-muted)", textTransform: "uppercase" };
+const td: React.CSSProperties = { padding: "16px 15px", fontSize: "15px" };
 
-const btnPrimary: React.CSSProperties = { background: "#0b5fff", color: "#fff", border: "none", borderRadius: 10, padding: "0 25px", height: 48, cursor: "pointer", fontWeight: 700, fontSize: "16px" };
-const btnGhost: React.CSSProperties = { background: "transparent", color: "var(--foreground)", border: "2px solid var(--border-color)", borderRadius: 10, padding: "0 20px", height: 48, cursor: "pointer", fontWeight: 700, fontSize: "16px" };
-const btnLogOut: React.CSSProperties = { background: "#ff4d4f", color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontWeight: 700, fontSize: "14px" };
-const btnAction: React.CSSProperties = { color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", cursor: "pointer", fontWeight: 700, fontSize: "15px", transition: "all 0.2s" };
+const filterInput: React.CSSProperties = { flex: 2, minWidth: 250, border: "1px solid var(--border-color)", borderRadius: 10, padding: "0 15px", height: 48, fontSize: "16px", background: "var(--bg-card)", color: "var(--foreground)" };
+const filterSelect: React.CSSProperties = { flex: 1, padding: "0 10px", border: "1px solid var(--border-color)", borderRadius: 10, height: 48, fontSize: "16px", background: "var(--bg-card)", color: "var(--foreground)" };
+
+const btnPrimary: React.CSSProperties = { background: "#0b5fff", color: "#fff", border: "none", borderRadius: 10, padding: "0 25px", height: 48, cursor: "pointer", fontWeight: 700 };
+const btnGhost: React.CSSProperties = { background: "transparent", color: "var(--foreground)", border: "2px solid var(--border-color)", borderRadius: 10, padding: "0 20px", height: 48, cursor: "pointer", fontWeight: 700 };
+const btnNewUser: React.CSSProperties = { background: "var(--primary)", color: "#000", border: "none", borderRadius: 10, padding: "0 25px", height: 48, cursor: "pointer", fontWeight: 700, marginLeft: "auto" };
+const btnAction: React.CSSProperties = { color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", cursor: "pointer", fontWeight: 700 };
+
+const floatingActions: React.CSSProperties = {
+  position: "fixed",
+  bottom: "30px",
+  left: "50%",
+  transform: "translateX(-20%)", // Ajustado para que no choque con la sidebar
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  width: "600px",
+  padding: "20px 30px",
+  background: "var(--bg-card)",
+  borderRadius: "20px",
+  border: "1px solid var(--border-color)",
+  boxShadow: "0 15px 40px rgba(0,0,0,0.25)",
+  zIndex: 900
+};
