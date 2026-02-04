@@ -167,8 +167,7 @@ export default function UserTable({
                             fontSize: 11,
                             textTransform: "uppercase"
                         }}>
-                          {u.rol}
-                        </span>
+                        {u.rol === "admin" ? "Administrador" : "Usuario"}                        </span>
                       </td>
                       <td style={{ ...td, fontSize: "18px" }}>{u.activo ? "✅" : "❌"}</td>
                       <td style={td}>{d.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
