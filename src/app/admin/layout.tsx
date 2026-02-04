@@ -149,18 +149,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <main style={{ flex: 1, background: "var(--background)", color: "var(--foreground)", padding: "20px" }}>
           {children}
         </main>
-
-        {/* FOOTER INTEGRADO */}
-        <footer style={footerStyle}>
-           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', alignItems: 'center' }}>
-             <span>soporte@frosttrack.com</span>
-             <span>|</span>
-             <span>612345678</span>
-             <div style={{ fontSize: '12px', opacity: 0.8, width: '100%', textAlign: 'center', marginTop: '10px' }}>
-               © 2026 FrostTrack. Todos los derechos reservados.
-             </div>
-           </div>
-        </footer>
       </div>
     </div>
   );
