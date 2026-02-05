@@ -17,6 +17,9 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("user");
+  
+  // NUEVO ESTADO PARA EL OJITO
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <main className={styles.wrapper}>
@@ -60,7 +63,7 @@ export default function LoginPage() {
                 Iniciar sesión
               </h2>
 
-              {/* Selector de rol (solo UI) */}
+              {/* Selector de rol */}
               <div className={styles.roleRow}>
                 <button
                   type="button"
@@ -96,15 +99,15 @@ export default function LoginPage() {
                     const res = await signIn("credentials", {
                       email,
                       password,
-                      redirect: false, // 👈 importante
+                      redirect: false,
                     });
 
                     if (res?.ok) {
-                      // 🔥 REDIRECCIÓN SEGÚN ROL
                       if (role === "admin") {
                         router.replace("/admin");
                       } else {
-                      router.replace("/admin/users/dashboard");                      }
+                        router.replace("/admin/users/dashboard");
+                      }
                     } else {
                       setMessage("Credenciales incorrectas");
                     }
@@ -128,20 +131,31 @@ export default function LoginPage() {
                   />
                 </div>
 
-                {/* PASSWORD */}
+                {/* PASSWORD CON OJITO */}
                 <div className={styles.field}>
                   <label htmlFor="password" className={styles.label}>
                     Contraseña
                   </label>
-                  <input
-                    id="password"
-                    type="password"
-                    className={styles.input}
-                    required
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                  <div className={styles.passwordWrapper}>
+                    <input
+                      id="password"
+                      // Cambia dinámicamente entre password y text
+                      type={showPassword ? "text" : "password"}
+                      className={styles.input}
+                      required
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className={styles.eyeButton}
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1} // Para que no moleste al usar el Tabulador
+                    >
+                      {showPassword ? "🙈" : "👁️"}
+                    </button>
+                  </div>
                 </div>
 
                 <button
