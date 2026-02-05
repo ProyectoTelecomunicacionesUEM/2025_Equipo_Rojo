@@ -6,62 +6,34 @@
   align-items: center;
   justify-content: center;
   padding: 40px;
-  padding-top: 24px; /* espacio debajo del topbar */
+  padding-top: 24px;
 }
 
-/* Grid 2 columnas (imagen izq, form der) */
 .split {
   display: grid;
   grid-template-columns: 1.3fr 1fr;
-  gap: 48px;                    /* como referencia */
+  gap: 48px;
   width: 100%;
   max-width: 1200px;
   align-items: center;
 }
 
 /* ---------- Columna izquierda ---------- */
-
-/* styles.module.css */
 .left {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 12px;
-  background: transparent; /* importante */
+  background: transparent;
 }
 
 .heroImg {
   width: 100%;
   max-width: 520px;
   height: auto;
-  object-fit: contain;                         /* no deforma */
-  filter: drop-shadow(0 14px 30px rgba(31,87,214,.18));  /* halo pro */
+  object-fit: contain;
+  filter: drop-shadow(0 14px 30px rgba(31,87,214,.18));
 }
-
-
-.leftBrand {
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 800;
-  color: var(--secondary);
-  letter-spacing: -0.02em;
-}
-
-.tagline {
-  margin-top: 12px;
-  font-size: clamp(16px, 2.2vw, 22px);
-  color: var(--foreground-accent);
-  max-width: 520px;
-}
-
-
-.heroImg {
-  width: 100%;
-  max-width: 520px;
-  height: auto;
-  object-fit: contain;                         /* no deforma */
-  filter: drop-shadow(0 14px 30px rgba(31,87,214,.18));  /* halo pro */
-}
-
 
 /* ---------- Columna derecha (formulario) ---------- */
 .right {
@@ -70,7 +42,6 @@
   justify-content: center;
 }
 
-/* ---------- Tarjeta compacta ---------- */
 .card {
   width: 100%;
   max-width: 360px;  
@@ -80,7 +51,7 @@
   border: 1px solid var(--border);
   box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
-/* ---------- Título de la tarjeta ---------- */
+
 .title {
   margin: 0 0 12px 0;
   font-size: 1.3rem;
@@ -88,12 +59,15 @@
   color: var(--foreground);
 }
 
-/* ---------- Selector de rol ---------- */
+/* ---------- Selector de rol (SOLUCIÓN TRANSPARENCIA MÓVIL) ---------- */
 .roleRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-bottom: 12px;
+  background: #f3f4f6; /* Fondo sutil para que el botón blanco resalte */
+  padding: 4px;
+  border-radius: 12px;
 }
 
 .roleBtn {
@@ -102,65 +76,57 @@
   justify-content: center;
   padding: 8px 12px;
   border-radius: 10px;
-  border: 1px solid #d1d5db;
-  background: #fff;
-  color: var(--foreground);
+  border: none; /* Quitamos borde para que no ensucie el diseño de bloque */
+  background: transparent;
+  color: #64748b;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease, transform .06s ease;
+  transition: all 0.2s ease;
+  /* IMPORTANTE MÓVIL */
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.roleBtn:hover {
-  background: #f3f4ff;
-  border-color: var(--secondary);
-}
-
-.roleBtn:active { transform: translateY(1px); }
-
+/* El botón activo ahora es azul (var--secondary) como el de entrar */
 .roleBtnActive {
-  background: var(--secondary);
-  color: #fff;
-  border-color: var(--secondary);
+  background-color: var(--secondary) !important;
+  color: #fff !important;
   box-shadow: 0 4px 12px rgba(48, 79, 255, .25);
+  opacity: 1 !important;
 }
 
-/* ---------- Formulario ---------- */
+/* ---------- Formulario e Inputs ---------- */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 12px;                   /* separación uniforme entre campos */
+  gap: 12px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;                    /* label + input */
+  gap: 6px;
 }
 
 .label {
   display: block;
-  font-size: 16px;             /* consistente con referencia */
+  font-size: 16px;
   font-weight: 600;
   color: var(--foreground-accent);
 }
 
-/* ---------- Inputs del formulario ---------- */
 .input {
-  width: 100%;                 /* ocupa todo el ancho */
-  height: 40px;                /* altura uniforme */
-  padding: 8px 12px;           /* padding interno consistente */
-  font-size: 16px;             /* texto uniforme */
+  width: 100%;
+  height: 40px;
+  padding: 8px 12px;
+  font-size: 16px;
   color: var(--foreground);
-  background: #f9fafb;         /* fondo gris claro */
-  border: 1px solid #e6e8ee;  /* borde consistente */
-  border-radius: 10px;         /* esquinas iguales */
+  background: #f9fafb;
+  border: 1px solid #e6e8ee;
+  border-radius: 10px;
   outline: none;
-  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
-}
-
-.input::placeholder { 
-  color: #9aa3b2;              /* placeholder gris uniforme */
+  transition: all .18s ease;
 }
 
 .input:focus {
@@ -169,10 +135,37 @@
   box-shadow: 0 0 0 3px rgba(48, 79, 255, 0.18);
 }
 
+/* ---------- El Ojito ---------- */
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordWrapper .input {
+  padding-right: 45px;
+}
+
+.eyeButton {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* ---------- Botón principal ---------- */
 .button {
   width: 100%;
-  height: 44px;                /* ligeramente más alto */
+  height: 44px;
   padding: 0 16px;
   background: var(--secondary);
   color: #fff;
@@ -181,28 +174,12 @@
   font-size: 17px;
   font-weight: 700;
   cursor: pointer;
-  transition: background .18s ease, box-shadow .18s ease, transform .06s ease;
+  transition: all .18s ease;
 }
 
 .button:hover { background: #2745f2; }
 .button:active { transform: translateY(1px); }
 .button:disabled { opacity: .55; cursor: not-allowed; }
-
-/* ---------- Footer bajo el botón ---------- */
-.footer {
-  margin-top: 12px;
-  font-size: clamp(16px, 1.5vw, 20px);  /* ajusta según pantalla */
-  text-align: center;
-  color: var(--foreground-accent);
-}
-
-.link {
-  color: var(--secondary);
-  font-weight: 700;
-  text-decoration: none;
-  text-underline-offset: 3px;
-}
-.link:hover { text-decoration: underline; }
 
 /* ---------- Topbar ---------- */
 .topbar {
@@ -228,118 +205,31 @@
   font-size: clamp(32px, 4.5vw, 54px);  
   font-weight: 800;
   color: #fff;
-  letter-spacing: -0.3px;
+  text-decoration: none;
 }
 
-.topbarNav {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Botón pill de cabecera */
 .loginLink {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
   padding: 10px 20px;
   border-radius: 999px;
   background: #fff;
   color: var(--secondary);
-  font-size: clamp(16px, 2vw, 24px);
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  transition: background .15s ease, box-shadow .15s ease, transform .06s ease;
 }
 
-.loginLink:hover {
-  background: #f7f7ff;
-  box-shadow: 0 4px 12px rgba(48, 79, 255, 0.25);
-}
-
-.loginLink:active { transform: translateY(1px); }
-
-.loginLink:focus-visible {
-  outline: none;
-  box-shadow:
-    0 0 0 3px rgba(255,255,255,0.9),
-    0 0 0 6px rgba(48,79,255,0.35);
-}
-
-/* ---------- Responsive ---------- */
+/* ---------- Responsive (Tus originales) ---------- */
 @media (max-width: 980px) {
   .split {
-    grid-template-columns: 1fr;  /* apila: imagen arriba, form abajo */
+    grid-template-columns: 1fr; 
     gap: 28px;
   }
-
-  .leftBrand,
-  .tagline {
-    text-align: center;
-  }
-
-  .heroImg {
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
-  .card {
-    max-width: 440px;            /* permite más ancho en tablet */
-  }
+  .leftBrand, .tagline { text-align: center; }
+  .heroImg { max-width: 420px; margin: 0 auto; }
+  .card { max-width: 440px; margin: 0 auto; }
 }
 
 @media (max-width: 720px) {
-  .topbarInner { padding: 10px 16px; }
-
-  .topbarBrand {
-    font-size: clamp(28px, 6vw, 40px);
-  }
-
-  .loginLink {
-    font-size: clamp(14px, 3vw, 18px);
-  }
-
+  .topbarBrand { font-size: clamp(28px, 6vw, 40px); }
   .heroImg { max-width: 320px; }
-  .card { max-width: 420px; }
-}
-
-.passwordWrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-/* El input de contraseña necesita un poco de padding a la derecha para no pisar el ojo */
-.passwordWrapper .input {
-  width: 100%;
-  padding-right: 45px; /* Espacio para el icono */
-}
-
-.eyeButton {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-  transition: opacity 0.2s;
-  z-index: 10;
-}
-
-.eyeButton:hover {
-  opacity: 0.7;
-}
-
-/* Ajuste responsive para que el ojo no se mueva en pantallas pequeñas */
-@media (max-width: 768px) {
-  .eyeButton {
-    right: 10px;
-    font-size: 1.1rem;
-  }
 }
