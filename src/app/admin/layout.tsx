@@ -55,10 +55,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           padding: 8px 12px; border-radius: 6px; cursor: pointer;
         }
 
+        /* ... (resto de tus estilos anteriores) */
+
         @media (max-width: 768px) {
-          .sidebar { transform: translateX(${isMobileMenuOpen ? "0" : "-100%"}); }
-          .main-wrapper { margin-left: 0; }
-          .btn-menu-toggle { display: block; }
+          .sidebar { 
+            /* Ajustamos el ancho para que no sea excesivo en pantallas pequeñas */
+            width: 80%; 
+            max-width: 300px;
+            /* Aplicamos la transformación */
+            transform: translateX(${isMobileMenuOpen ? "0" : "-100%"}); 
+            /* Añadimos una sombra para que "flote" sobre el contenido */
+            box-shadow: ${isMobileMenuOpen ? "5px 0 15px rgba(0,0,0,0.5)" : "none"};
+          }
+          
+          .main-wrapper { 
+            margin-left: 0; 
+          }
+
+          .btn-menu-toggle { 
+            display: block; 
+          }
+
+          /* Opcional: Evitar que el contenido se mueva si el menú está abierto */
+          .admin-container {
+            overflow-x: hidden;
+          }
         }
       `}</style>
 
