@@ -66,13 +66,14 @@ export default function UserDashboard() {
           </div>
         </div>
 
-        {/* GRÁFICA RESPONSIVE */}
+       {/* GRÁFICA RESPONSIVE CON MÁS ALTURA EN MÓVIL */}
         <div className="mb-6 sm:mb-10 rounded-3xl border border-slate-200 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
-          <div className="h-[300px] sm:h-[400px] w-full p-2 sm:p-4"> 
+          {/* h-[450px] para móvil, sm:h-[400px] para escritorio */}
+          <div className="h-[450px] sm:h-[400px] w-full p-1 sm:p-4"> 
             {historico.length > 0 ? (
               <GraficaFlota datos={historico} />
             ) : (
-              <div className="flex h-full items-center justify-center text-slate-400 text-sm">
+              <div className="flex h-full items-center justify-center text-slate-400 text-sm italic">
                 Sincronizando telemetría...
               </div>
             )}
