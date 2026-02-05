@@ -37,72 +37,74 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen w-full bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <div className="mx-auto max-w-[900px] px-5 py-10">
+      <div className="mx-auto max-w-[900px] px-4 py-6 sm:px-6 sm:py-10">
 
         {/* HEADER */}
-        <header className="mb-10">
-          <h1 className="text-3xl font-black">Control de Flota ❄️</h1>
-          <p className="mt-1 text-slate-500 dark:text-slate-400">
+        <header className="mb-6 sm:mb-10 text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl font-black">Control de Flota ❄️</h1>
+          <p className="mt-1 text-sm sm:text-base text-slate-500 dark:text-slate-400">
             Operador: <span className="font-bold text-sky-500">{(session?.user as any)?.name || "Admin"}</span>
           </p>
         </header>
 
-        {/* TARJETA PRINCIPAL */}
-        <div className="mb-10 flex items-center justify-between rounded-3xl border border-slate-200 bg-white p-10 shadow-xl dark:border-slate-800 dark:bg-slate-900">
-          <div>
-            <span className="text-xs font-extrabold tracking-widest text-sky-500">UNIDAD ACTIVA</span>
-            <h2 className="my-1 text-5xl font-black">{camion.id}</h2>
-            <div className={`mt-3 inline-block rounded-lg border px-3 py-1 text-sm font-bold ${
+        {/* TARJETA PRINCIPAL RESPONSIVE */}
+        <div className="mb-6 sm:mb-10 flex flex-col sm:flex-row items-center justify-between rounded-3xl border border-slate-200 bg-white p-6 sm:p-10 shadow-xl dark:border-slate-800 dark:bg-slate-900 gap-6">
+          <div className="text-center sm:text-left">
+            <span className="text-[10px] sm:text-xs font-extrabold tracking-widest text-sky-500 uppercase">Unidad Activa</span>
+            <h2 className="my-1 text-3xl sm:text-5xl font-black">{camion.id}</h2>
+            <div className={`mt-3 inline-block rounded-lg border px-3 py-1 text-xs sm:text-sm font-bold ${
               camion.temp > 5 ? "border-red-400/30 bg-red-400/10 text-red-400" : "border-green-400/30 bg-green-400/10 text-green-400"
             }`}>
               {camion.temp > 5 ? "⚠️ ALERTA: REVISAR FRÍO" : "✅ SISTEMA ESTABLE"}
             </div>
           </div>
-          <div className="text-[100px] font-black leading-none">
-            {camion.temp}<span className="text-4xl text-slate-400">°</span>
+          
+          {/* Temperatura más grande en móvil y centrada */}
+          <div className="text-7xl sm:text-[100px] font-black leading-none flex items-start">
+            {camion.temp}
+            <span className="text-2xl sm:text-4xl text-slate-400 mt-2">°</span>
           </div>
         </div>
 
-      {/* GRÁFICA REAL */}
-        <div className="mb-10 rounded-3xl border border-slate-200 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
-          {/* QUITAMOS EL h3 QUE ESTABA AQUÍ PORQUE LA GRÁFICA YA TRAE EL SUYO */}
-          
-          <div className="h-[400px] w-full p-4"> {/* Añadimos un poco de padding aquí */}
+        {/* GRÁFICA RESPONSIVE */}
+        <div className="mb-6 sm:mb-10 rounded-3xl border border-slate-200 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
+          <div className="h-[300px] sm:h-[400px] w-full p-2 sm:p-4"> 
             {historico.length > 0 ? (
               <GraficaFlota datos={historico} />
             ) : (
-              <div className="flex h-full items-center justify-center text-slate-400">
+              <div className="flex h-full items-center justify-center text-slate-400 text-sm">
                 Sincronizando telemetría...
               </div>
             )}
           </div>
         </div>
-        {/* TABLA */}
-        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900">
-          <table className="w-full border-collapse">
+
+        {/* TABLA (Con scroll horizontal en móviles muy pequeños) */}
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-lg dark:border-slate-800 dark:bg-slate-900">
+          <table className="w-full border-collapse min-w-[400px]">
             <thead className="bg-slate-50 dark:bg-slate-800/50">
               <tr>
-                <th className="px-5 py-4 text-left text-xs font-extrabold text-slate-500">SENSOR</th>
-                <th className="px-5 py-4 text-left text-xs font-extrabold text-slate-500">VALOR</th>
-                <th className="px-5 py-4 text-left text-xs font-extrabold text-slate-500">ESTADO</th>
+                <th className="px-5 py-4 text-left text-[10px] sm:text-xs font-extrabold text-slate-500 uppercase">Sensor</th>
+                <th className="px-5 py-4 text-left text-[10px] sm:text-xs font-extrabold text-slate-500 uppercase">Valor</th>
+                <th className="px-5 py-4 text-left text-[10px] sm:text-xs font-extrabold text-slate-500 uppercase">Estado</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-sm sm:text-base">
               <tr>
-                <td className="px-5 py-4">Cámara Trasera</td>
+                <td className="px-5 py-4 text-slate-600 dark:text-slate-300">Cámara Trasera</td>
                 <td className="px-5 py-4 font-bold">{camion.temp}°C</td>
-                <td className="px-5 py-4 text-xs font-bold text-sky-500">ACTIVO</td>
+                <td className="px-5 py-4 text-[10px] sm:text-xs font-bold text-sky-500">ACTIVO</td>
               </tr>
               <tr className="bg-slate-50/50 dark:bg-slate-800/30">
-                <td className="px-5 py-4">Módulo GPS</td>
+                <td className="px-5 py-4 text-slate-600 dark:text-slate-300">Módulo GPS</td>
                 <td className="px-5 py-4 font-bold">Señal Alta</td>
-                <td className="px-5 py-4 text-xs font-bold text-sky-500">ONLINE</td>
+                <td className="px-5 py-4 text-[10px] sm:text-xs font-bold text-sky-500">ONLINE</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <footer className="mt-12 text-center text-[11px] tracking-widest opacity-40">
+        <footer className="mt-12 mb-6 text-center text-[10px] tracking-widest opacity-40 uppercase">
           SISTEMA DE MONITOREO PROFESIONAL V2.0
         </footer>
       </div>
