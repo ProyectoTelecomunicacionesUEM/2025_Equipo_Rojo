@@ -3,32 +3,31 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 export default function GraficaFlota({ datos }: { datos: any[] }) {
   // Damos la vuelta a los datos para que el tiempo vaya de izquierda a derecha
-  const dataReversed = [...datos].reverse();
+  const dataReversed = datos && datos.length > 0 ? [...datos].reverse() : [];
 
   return (
     <div style={{ 
       width: '100%', 
-      height: '450px', // Aumentamos la altura total
       background: 'var(--bg-card)', 
       padding: '20px', 
       borderRadius: '12px', 
       marginTop: '20px', 
       border: '1px solid var(--border-color)',
-      display: 'flex',
-      flexDirection: 'column' // Alineamos título arriba y gráfica abajo
     }}>
       <h3 style={{ 
         marginBottom: '20px', 
         fontSize: '16px',
         fontWeight: 'bold',
-        flexShrink: 0 // Evita que el título se aplaste
+        color: 'var(--foreground)'
       }}>
         Tendencia de Temperatura (Histórico)
       </h3>
 
-      {/* Este div intermedio asegura que Recharts calcule bien el espacio restante */}
-      <div style={{ flexGrow: 1, width: '100%', minHeight: 0 }}>
-        <ResponsiveContainer width="100%" height="100%">
+      {/* QUITAMOS el flex y el height: 100% que daban error. 
+          Ponemos un alto fijo de 350px al ResponsiveContainer.
+      */}
+      <div style={{ width: '100%', minHeight: '350px' }}>
+        <ResponsiveContainer width="99%" height={350}>
           <LineChart data={dataReversed} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
             <XAxis 
@@ -40,13 +39,14 @@ export default function GraficaFlota({ datos }: { datos: any[] }) {
               fontSize={12}
               tickLine={false}
               axisLine={false}
+              domain={['auto', 'auto']}
             />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: 'var(--bg-card)', 
-                borderColor: 'var(--border-color)', 
+                backgroundColor: '#1e293b', 
+                borderColor: '#334155', 
                 borderRadius: '8px',
-                color: 'var(--foreground)' 
+                color: '#f8fafc' 
               }}
               itemStyle={{ color: '#0b5fff' }}
             />
@@ -57,7 +57,7 @@ export default function GraficaFlota({ datos }: { datos: any[] }) {
               strokeWidth={3} 
               dot={{ r: 3, fill: '#0b5fff' }} 
               activeDot={{ r: 6, strokeWidth: 0 }} 
-              animationDuration={1000}
+              isAnimationActive={false} // Desactivamos animación para evitar parpadeos en renders rápidos
             />
           </LineChart>
         </ResponsiveContainer>

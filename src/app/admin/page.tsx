@@ -1,9 +1,10 @@
-import { db } from "@/lib/db";
+import { db, measurements, trucks } from "@/lib/db";
 import GraficaFlota from "@/components/GraficaFlota";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/authOptions";
 import { redirect } from "next/navigation";
+import { desc, count, inArray } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -15,7 +16,7 @@ export default async function AdminDashboard({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session || session?.user?.role !== "admin") {
+  if (!session || (session?.user as any)?.role !== "admin") {
     redirect("/login");
   }
 
@@ -30,20 +31,33 @@ export default async function AdminDashboard({
   let totalCamiones = 0;
 
   try {
-    const resTabla = await db.query(
-      "SELECT * FROM measurements ORDER BY created_at DESC LIMIT $1 OFFSET $2",
-      [limit, offset]
-    );
-    medicionesTabla = resTabla.rows;
+    const misCamiones = await db.select({ id: trucks.id }).from(trucks);
+    const idsReales = misCamiones.map((t) => t.id);
 
-    const resGrafica = await db.query("SELECT * FROM measurements ORDER BY created_at DESC LIMIT 30");
-    medicionesGrafica = resGrafica.rows;
+    if (idsReales.length > 0) {
+      medicionesTabla = await db
+        .select()
+        .from(measurements)
+        .where(inArray(measurements.device_id, idsReales))
+        .orderBy(desc(measurements.created_at))
+        .limit(limit)
+        .offset(offset);
 
-    const resCount = await db.query("SELECT COUNT(*) as count FROM measurements");
-    totalLecturas = parseInt(resCount.rows[0].count);
+      medicionesGrafica = await db
+        .select()
+        .from(measurements)
+        .where(inArray(measurements.device_id, idsReales))
+        .orderBy(desc(measurements.created_at))
+        .limit(30);
 
-    const resCamiones = await db.query("SELECT COUNT(DISTINCT device_id) as count FROM measurements");
-    totalCamiones = parseInt(resCamiones.rows[0].count);
+      const resCount = await db
+        .select({ total: count() })
+        .from(measurements)
+        .where(inArray(measurements.device_id, idsReales));
+      
+      totalLecturas = Number(resCount[0].total);
+      totalCamiones = idsReales.length;
+    }
   } catch (error) {
     console.error("Error en DB:", error);
   }
@@ -51,192 +65,106 @@ export default async function AdminDashboard({
   const hasNextPage = totalLecturas > currentPage * limit;
 
   return (
-    <div key={currentPage} style={containerStyle}>
-      {/* CARDS CON GRID AUTO-ADAPTABLE */}
-      <div style={gridResponsiveStyle}>
-        <div style={cardStyle}>
-          <span style={labelStyle}>CAMIONES ACTIVOS</span>
-          <p style={valueStyle}>{totalCamiones}</p>
-        </div>
-        <div style={cardStyle}>
-          <span style={labelStyle}>LECTURAS TOTALES</span>
-          <p style={valueStyle}>{totalLecturas}</p>
-        </div>
-      </div>
+    <div className="min-h-screen w-full bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300">
+      <div className="mx-auto max-w-[1200px] px-5 py-10">
+        
+        {/* HEADER */}
+        <header className="mb-10 flex justify-between items-center">
+          <h1 className="text-3xl font-black tracking-tight">
+            Control de flota en tiempo real 🚛
+          </h1>
+        </header>
 
-      {/* GRÁFICA (ResponsiveContainer ya se encarga del ancho) */}
-      <div style={graphWrapperStyle}>
-        <GraficaFlota datos={medicionesGrafica} />
-      </div>
-
-      {/* SECCIÓN TABLA RESPONSIVE */}
-      <div style={tableCardStyle}>
-        <div style={tableControlsStyle}>
-          <h3 style={{ margin: 0, fontSize: "16px" }}>Historial</h3>
+        {/* TARJETAS DE RESUMEN */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            <span className="text-xs font-extrabold tracking-widest text-slate-400 uppercase">
+              Camiones Gestionados
+            </span>
+            <p className="mt-2 text-5xl font-black">{totalCamiones}</p>
+          </div>
           
-          <div style={paginationGroupStyle}>
-            <span style={pageNumberStyle}>Pág. {currentPage}</span>
-            <div style={{ display: "flex", gap: "4px" }}>
-              {currentPage > 1 ? (
-                <Link href={`/admin?page=${currentPage - 1}`} style={btnStyle}>←</Link>
-              ) : (
-                <span style={btnDisabled}>←</span>
-              )}
-              {hasNextPage ? (
-                <Link href={`/admin?page=${currentPage + 1}`} style={btnStyle}>→</Link>
-              ) : (
-                <span style={btnDisabled}>→</span>
-              )}
-            </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            <span className="text-xs font-extrabold tracking-widest text-slate-400 uppercase">
+              Lecturas de tu flota
+            </span>
+            <p className="mt-2 text-5xl font-black">{totalLecturas}</p>
           </div>
         </div>
 
-        {/* CONTENEDOR CON SCROLL HORIZONTAL PARA MÓVILES */}
-        <div style={scrollContainerStyle}>
-          <table style={tableStyle}>
-            <thead>
-              <tr style={tableHeaderRowStyle}>
-                <th style={thStyle}>ID Camión</th>
-                <th style={thStyle}>Temp.</th>
-                <th style={thStyle}>Estado</th>
-                <th style={thStyle}>Hora</th>
-              </tr>
-            </thead>
-            <tbody>
-              {medicionesTabla.map((m) => {
-                const alerta = m.temperature > 5;
-                return (
-                  <tr key={m.id} style={alerta ? rowAlertStyle : rowStyle}>
-                    <td style={tdStyle}>{alerta ? "⚠️ " : ""}{m.device_id}</td>
-                    <td style={{ ...tdStyle, color: alerta ? "#ff4d4f" : "#0b5fff", fontWeight: "bold" }}>
-                      {m.temperature}°C
-                    </td>
-                    <td style={tdStyle}>
-                      <span style={statusTagStyle}>{m.status}</span>
-                    </td>
-                    <td style={tdStyle}>{new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        {/* GRÁFICA */}
+        <div className="mb-10 rounded-3xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
+          <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">
+              Tendencia de Temperatura (Histórico Real)
+            </h3>
+          </div>
+          <div className="h-[400px] w-full p-6">
+            <GraficaFlota datos={medicionesGrafica} />
+          </div>
+        </div>
+
+        {/* TABLA */}
+        <div className="rounded-3xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
+          <div className="flex justify-between items-center p-6 bg-slate-50/50 dark:bg-slate-800/50">
+            <h3 className="font-bold">Últimos Registros</h3>
+            
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium">Pág. {currentPage}</span>
+              <div className="flex gap-2">
+                {currentPage > 1 ? (
+                  <Link href={`/admin?page=${currentPage - 1}`} className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-sm font-bold transition-all">←</Link>
+                ) : (
+                  <span className="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-400 rounded-xl text-sm cursor-not-allowed">←</span>
+                )}
+                {hasNextPage ? (
+                  <Link href={`/admin?page=${currentPage + 1}`} className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-xl text-sm font-bold transition-all">→</Link>
+                ) : (
+                  <span className="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-400 rounded-xl text-sm cursor-not-allowed">→</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-slate-800">
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase">ID Camión</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase">Temp.</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase">Estado</th>
+                  <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase">Hora</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {medicionesTabla.map((m: any) => {
+                  const alerta = m.temperature > 5;
+                  return (
+                    <tr key={m.id} className={`${alerta ? 'bg-red-50/30 dark:bg-red-900/10' : ''} hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors`}>
+                      <td className="px-6 py-4 font-medium">{alerta ? "⚠️ " : "🚛 "}{m.device_id}</td>
+                      <td className={`px-6 py-4 font-black ${alerta ? "text-red-500" : "text-sky-500"}`}>
+                        {m.temperature}°C
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                          alerta 
+                            ? "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:text-red-400 dark:border-red-800" 
+                            : "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-400 dark:border-green-800"
+                        }`}>
+                          {m.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-slate-400 text-sm italic">
+                        {m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-
-// --- SISTEMA DE ESTILOS ADAPTABLES ---
-
-const containerStyle: React.CSSProperties = {
-  padding: "16px",
-  maxWidth: "1200px",
-  margin: "0 auto",
-  minHeight: "100vh",
-  fontFamily: "system-ui, sans-serif"
-};
-
-const headerStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  flexWrap: "wrap",
-  gap: "15px",
-  marginBottom: "25px"
-};
-
-const titleStyle: React.CSSProperties = { fontSize: "clamp(1.5rem, 5vw, 2rem)", margin: 0 };
-const subtitleStyle: React.CSSProperties = { fontSize: "13px", opacity: 0.7, margin: "5px 0 0 0" };
-
-const badgeStyle: React.CSSProperties = {
-  background: "rgba(11, 95, 255, 0.1)",
-  color: "#0b5fff",
-  padding: "4px 12px",
-  borderRadius: "20px",
-  fontSize: "12px",
-  fontWeight: "bold"
-};
-
-const gridResponsiveStyle: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", // <--- MAGIA: Se ajusta solo
-  gap: "16px",
-  marginBottom: "25px"
-};
-
-const cardStyle: React.CSSProperties = {
-  background: "var(--bg-card)",
-  padding: "20px",
-  borderRadius: "16px",
-  border: "1px solid var(--border-color)",
-  boxShadow: "0 2px 4px rgba(0,0,0,0.05)"
-};
-
-const labelStyle: React.CSSProperties = { fontSize: "11px", fontWeight: "600", color: "var(--text-muted)", letterSpacing: "0.5px" };
-const valueStyle: React.CSSProperties = { fontSize: "32px", fontWeight: "800", margin: "8px 0 0 0" };
-
-const graphWrapperStyle: React.CSSProperties = {
-  background: "var(--bg-card)",
-  borderRadius: "16px",
-  border: "1px solid var(--border-color)",
-  marginBottom: "25px",
-  overflow: "hidden"
-};
-
-const tableCardStyle: React.CSSProperties = {
-  background: "var(--bg-card)",
-  borderRadius: "16px",
-  border: "1px solid var(--border-color)",
-  padding: "16px"
-};
-
-const tableControlsStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  flexWrap: "wrap",
-  gap: "15px",
-  marginBottom: "15px"
-};
-
-const paginationGroupStyle: React.CSSProperties = { display: "flex", alignItems: "center", gap: "12px" };
-const pageNumberStyle: React.CSSProperties = { fontSize: "13px", fontWeight: "600" };
-
-const scrollContainerStyle: React.CSSProperties = {
-  width: "100%",
-  overflowX: "auto", // <--- Necesario para móviles
-  WebkitOverflowScrolling: "touch"
-};
-
-const tableStyle: React.CSSProperties = { width: "100%", borderCollapse: "collapse", minWidth: "600px" };
-const tableHeaderRowStyle: React.CSSProperties = { borderBottom: "2px solid var(--border-color)", textAlign: "left" };
-const thStyle: React.CSSProperties = { padding: "12px", fontSize: "12px", color: "var(--text-muted)", textTransform: "uppercase" };
-const rowStyle: React.CSSProperties = { borderBottom: "1px solid var(--border-color)" };
-const rowAlertStyle: React.CSSProperties = { borderBottom: "1px solid var(--border-color)", backgroundColor: "rgba(255, 77, 79, 0.05)" };
-const tdStyle: React.CSSProperties = { padding: "14px 12px", fontSize: "14px" };
-
-const statusTagStyle: React.CSSProperties = {
-  background: "rgba(0,0,0,0.05)",
-  padding: "2px 8px",
-  borderRadius: "4px",
-  fontSize: "11px"
-};
-
-const btnStyle: React.CSSProperties = {
-  padding: "6px 14px",
-  background: "#0b5fff",
-  color: "white",
-  borderRadius: "8px",
-  textDecoration: "none",
-  fontSize: "14px",
-  fontWeight: "bold"
-};
-
-const btnDisabled: React.CSSProperties = {
-  padding: "6px 14px",
-  background: "var(--border-color)",
-  color: "var(--text-muted)",
-  borderRadius: "8px",
-  fontSize: "14px",
-  cursor: "not-allowed"
-};

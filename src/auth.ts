@@ -10,6 +10,7 @@ declare module "next-auth" {
       id: string;              // obligatorio
       email: string;           // obligatorio
       role: "admin" | "user";  // obligatorio
+      name?: string;
     };
   }
 

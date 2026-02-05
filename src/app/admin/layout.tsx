@@ -70,12 +70,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <Link href="/admin" style={linkStyle} onClick={() => setIsMobileMenuOpen(false)}>🏠 Inicio (Dashboard)</Link>
+<Link href={isAdmin ? "/admin" : "/admin/users/dashboard"} style={linkStyle} onClick={() => setIsMobileMenuOpen(false)}>🏠 Inicio (Dashboard)</Link>             
           {isAdmin && (
             <>
               <div style={sectionTitleStyle}>ZONA DE ADMINISTRACIÓN</div>
               <Link href="/admin/users" style={linkStyle} onClick={() => setIsMobileMenuOpen(false)}>👥 Gestionar Usuarios</Link>
-              <Link href="/admin/devices" style={linkStyle} onClick={() => setIsMobileMenuOpen(false)}>📦 Estado de Flota</Link>
+              <Link href="/admin/devices" style={linkStyle} onClick={() => setIsMobileMenuOpen(false)}>🔧 Asignar Camiones</Link>
+              <Link href="/admin/fleet" style={linkStyle} onClick={() => setIsMobileMenuOpen(false)}>📦 Estado de Flota</Link>
+
             </>
           )}
         </div>

@@ -104,8 +104,7 @@ export default function LoginPage() {
                       if (role === "admin") {
                         router.replace("/admin");
                       } else {
-                        router.replace("/dashboard");
-                      }
+                      router.replace("/admin/users/dashboard");                      }
                     } else {
                       setMessage("Credenciales incorrectas");
                     }

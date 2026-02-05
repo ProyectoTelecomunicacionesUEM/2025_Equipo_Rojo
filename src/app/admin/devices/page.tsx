@@ -1,143 +1,108 @@
-import { db } from "@/lib/db";
+import { db, trucks, subscribers } from "@/lib/db"; 
+import { asignarCamionAction } from "./actions";
+import { revalidatePath } from "next/cache";
 
-export const revalidate = 0;
+export default async function GestionDispositivos() {
+  // Traemos los datos frescos
+  const listaCamiones = await db.select().from(trucks);
+  const listaUsuarios = await db.select().from(subscribers); 
 
-export default async function FleetStatusPage() {
-  // SQL para obtener solo la ÚLTIMA medición de cada camión distinto
-  const res = await db.query(`
-    SELECT DISTINCT ON (device_id) 
-      device_id, temperature, status, created_at 
-    FROM measurements 
-    ORDER BY device_id, created_at DESC
-  `);
-  const flota = res.rows;
+  // Función para añadir camiones
+  async function crearCamion(formData: FormData) {
+    "use server";
+    const id = formData.get("id") as string;
+    if (!id) return;
+
+    try {
+      const { db, trucks } = await import("@/lib/db");
+      await db.insert(trucks).values({ id }); 
+      revalidatePath("/admin/devices");
+    } catch (e) {
+      console.log("El camión ya existe");
+    }
+  }
 
   return (
-    <div style={{ padding: "40px", minHeight: "100vh" }}>
-      {/* Animación CSS para las alertas */}
-      <style>{`
-        @keyframes pulse-red {
-          0% { opacity: 1; }
-          50% { opacity: 0.5; }
-          100% { opacity: 1; }
-        }
-        .alerta-parpado {
-          animation: pulse-red 1.5s infinite;
-        }
-      `}</style>
+    <div className="min-h-screen w-full bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100 p-10">
+      <div className="mx-auto max-w-[900px]">
+        
+        <h1 className="text-3xl font-black mb-8 flex items-center gap-3">
+          🛠️ <span className="tracking-tight">Asignación de Conductores</span>
+        </h1>
+        
+        {/* --- FORMULARIO DE AÑADIR --- */}
+        <div className="mb-10 rounded-3xl border border-slate-200 bg-white p-8 shadow-xl dark:border-slate-800 dark:bg-slate-900">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-4">
+            Añadir Camión a la Flota
+          </h3>
+          <form action={crearCamion} className="flex flex-col sm:flex-row gap-4">
+            <input 
+              name="id" 
+              placeholder="Matrícula (ej: CAMION-01)" 
+              required 
+              className="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 focus:ring-2 focus:ring-sky-500 outline-none dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+            />
+            <button 
+              type="submit" 
+              className="px-8 py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-sky-500/20 active:scale-95"
+            >
+              Añadir
+            </button>
+          </form>
+        </div>
 
-      <h1 style={{ 
-        color: "var(--foreground)", 
-        marginBottom: "30px", 
-        fontSize: "28px", 
-        fontWeight: "bold" 
-      }}>
-        Estado Actual de la Flota
-      </h1>
-
-      <div style={{ 
-        display: "grid", 
-        gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", 
-        gap: "25px" 
-      }}>
-        {flota.map((camion) => {
-          const isHot = camion.temperature > 5;
-          // Simulamos valores extra (si no están en tu BD, puedes quitarlos)
-          const bateria = 85; 
-          const tieneGps = true;
-
-          return (
-            <div key={camion.device_id} style={{
-              padding: "24px",
-              background: "#ffffff", // Tarjetas blancas para que destaquen
-              borderRadius: "16px",
-              borderLeft: `10px solid ${isHot ? "#ff4d4f" : "#2ecc71"}`,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-              color: "#1a1a1a",
-              position: "relative",
-              transition: "transform 0.2s ease"
-            }}>
-              
-              {/* Indicadores de Sensores (Top Right) */}
-              <div style={{ 
-                position: "absolute", 
-                top: "20px", 
-                right: "20px", 
-                display: "flex", 
-                gap: "12px",
-                fontSize: "14px",
-                alignItems: "center"
-              }}>
-                <span title="GPS Activo">{tieneGps ? "🛰️" : "❌"}</span>
-                <span style={{ 
-                  fontWeight: "700", 
-                  color: bateria < 20 ? "#ff4d4f" : "#2ecc71",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px"
-                }}>
-                  {bateria}% 🔋
-                </span>
-              </div>
-
-              {/* Título del Camión */}
-              <h3 style={{ 
-                margin: 0, 
-                fontSize: "12px", 
-                color: "#888", 
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                fontWeight: "700"
-              }}>
-                🚚 {camion.device_id.replace("_", " ")}
-              </h3>
-
-              {/* Temperatura Principal */}
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", margin: "12px 0" }}>
-                <p style={{ 
-                  fontSize: "38px", 
-                  fontWeight: "800", 
-                  margin: 0,
-                  color: isHot ? "#ff4d4f" : "#1a1a1a",
-                  letterSpacing: "-1.5px"
-                }}>
-                  {camion.temperature}°C
-                </p>
-                
-                {isHot && (
-                  <span className="alerta-parpado" style={{ 
-                    background: "#fff1f0",
-                    color: "#ff4d4f",
-                    padding: "4px 8px",
-                    borderRadius: "6px",
-                    fontSize: "11px",
-                    fontWeight: "800",
-                    border: "1px solid #ffa39e",
-                    textTransform: "uppercase"
-                  }}>
-                    ⚠️ Revisar Nevera
-                  </span>
-                )}
-              </div>
-
-              {/* Info Inferior (Footer de la tarjeta) */}
-              <div style={{ 
-                marginTop: "15px",
-                paddingTop: "15px", 
-                borderTop: "1px solid #f0f0f0",
-                fontSize: "13px"
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", color: "#555" }}>
-                  <span>Estado: <strong style={{ color: "#1a1a1a" }}>{camion.status}</strong></span>
-                  <span style={{ opacity: 0.7 }}>
-                    🕒 {new Date(camion.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                </div>
-              </div>
-
+        {/* --- TABLA DE GESTIÓN --- */}
+        <div className="rounded-3xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
+          <table className="w-full border-collapse">
+            <thead className="bg-slate-50 dark:bg-slate-800/50">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Camión</th>
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Asignar a Conductor</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {listaCamiones.map((c) => (
+                <tr key={c.id + (c.operator_id || 'vacio')} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                  <td className="px-6 py-6 font-black text-lg">
+                    <span className="flex items-center gap-2">
+                      🚛 {c.id}
+                    </span>
+                  </td>
+                  <td className="px-6 py-6">
+                    <form action={asignarCamionAction} className="flex gap-3">
+                      <input type="hidden" name="truckId" value={c.id} />
+                      <select 
+                        name="email" 
+                        defaultValue={c.operator_id || ""} 
+                        className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-white text-slate-900 focus:ring-2 focus:ring-sky-500 outline-none dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+                      >
+                        <option value="">-- Sin asignar --</option>
+                        {listaUsuarios.map(u => (
+                          <option key={u.id} value={u.email}>{u.email}</option>
+                        ))}
+                      </select>
+                      <button 
+                        type="submit" 
+                        className="px-5 py-2 bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold rounded-xl hover:opacity-80 transition-all active:scale-95"
+                      >
+                        Guardar
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {listaCamiones.length === 0 && (
+            <div className="p-10 text-center text-slate-400 italic">
+              No hay camiones en la flota. Empieza por añadir uno arriba.
             </div>
-          );
-        })}
+          )}
+        </div>
+        
+        <footer className="mt-12 text-center text-[11px] tracking-widest opacity-40 uppercase">
+          Gestión de Dispositivos v2.0
+        </footer>
       </div>
     </div>
   );
