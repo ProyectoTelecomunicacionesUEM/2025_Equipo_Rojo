@@ -92,15 +92,17 @@ export default async function AdminDashboard({
           </div>
         </div>
 
-        {/* GRÁFICA */}
+                {/* GRÁFICA DE TENDENCIA - LIMPIA */}
         <div className="mb-10 rounded-3xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
-          <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400">
-              Tendencia de Temperatura (Histórico Real)
-            </h3>
-          </div>
-          <div className="h-[400px] w-full p-6">
-            <GraficaFlota datos={medicionesGrafica} />
+          {/* Quitamos el div de cabecera que sobraba aquí */}
+          <div className="h-[450px] w-full p-4"> 
+            {medicionesGrafica.length > 0 ? (
+              <GraficaFlota datos={medicionesGrafica} />
+            ) : (
+              <div className="flex h-full items-center justify-center text-slate-400 italic">
+                Esperando datos de telemetría...
+              </div>
+            )}
           </div>
         </div>
 
