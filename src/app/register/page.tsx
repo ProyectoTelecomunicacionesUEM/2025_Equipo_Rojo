@@ -17,7 +17,10 @@ export default function RegisterPage() {
   // Inputs controlados
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState(""); // 👈 NUEVO
+  const [password, setPassword] = useState("");
+  
+  // Estado para el ojito
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <main className={styles.wrapper}>
@@ -44,24 +47,24 @@ export default function RegisterPage() {
         </div>
       </header>
 
-      {/* CONTENIDO */}
+      {/* CONTENIDO PRINCIPAL */}
       <section className={styles.page}>
         <div className={styles.split}>
-          {/* IZQUIERDA */}
+          {/* COLUMNA IZQUIERDA (Imagen) */}
           <div className={styles.left}>
             <Image
               src="/images/tabletTransparente.png"
               alt="Registro de usuario"
               width={2500}
               height={2500}
-              className={styles.heroImage}
+              className={styles.heroImg} // Cambiado a heroImg para que coincida con el CSS del Login
               priority
             />
           </div>
 
-          {/* DERECHA */}
-          <div className={styles.right}>
-            <section className={styles.card} aria-labelledby="register-title">
+          {/* COLUMNA DERECHA (La Caja) */}
+          <section className={styles.right}>
+            <div className={styles.card} aria-labelledby="register-title">
               <h2 id="register-title" className={styles.title}>
                 Regístrate
               </h2>
@@ -81,10 +84,7 @@ export default function RegisterPage() {
                       );
                       return;
                     }
-
                     setMessage(res.message ?? "Registro completado.");
-
-                    // Limpiar inputs
                     setName("");
                     setEmail("");
                     setPassword("");
@@ -92,7 +92,7 @@ export default function RegisterPage() {
                 }}
                 noValidate
               >
-                {/* Nombre */}
+                {/* NOMBRE */}
                 <div className={styles.field}>
                   <label htmlFor="name" className={styles.label}>
                     Nombre
@@ -108,11 +108,11 @@ export default function RegisterPage() {
                     aria-invalid={Boolean(errors.name)}
                   />
                   {errors.name && (
-                    <p className={styles.errorText}>{errors.name[0]}</p>
+                    <p className={styles.errorText} style={{color: 'red', fontSize: '12px', marginTop: '4px'}}>{errors.name[0]}</p>
                   )}
                 </div>
 
-                {/* Email */}
+                {/* EMAIL */}
                 <div className={styles.field}>
                   <label htmlFor="email" className={styles.label}>
                     Correo electrónico
@@ -128,28 +128,38 @@ export default function RegisterPage() {
                     aria-invalid={Boolean(errors.email)}
                   />
                   {errors.email && (
-                    <p className={styles.errorText}>{errors.email[0]}</p>
+                    <p className={styles.errorText} style={{color: 'red', fontSize: '12px', marginTop: '4px'}}>{errors.email[0]}</p>
                   )}
                 </div>
 
-                {/* PASSWORD */}
+                {/* CONTRASEÑA CON OJITO */}
                 <div className={styles.field}>
                   <label htmlFor="password" className={styles.label}>
                     Contraseña
                   </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Mínimo 8 caracteres alfanuméricos"
-                    className={styles.input}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    aria-invalid={Boolean(errors.password)}
-                  />
+                  <div className={styles.passwordWrapper}>
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Mínimo 8 caracteres"
+                      className={styles.input}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      aria-invalid={Boolean(errors.password)}
+                    />
+                    <button
+                      type="button"
+                      className={styles.eyeButton}
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? "🙈" : "👁️"}
+                    </button>
+                  </div>
                   {errors.password && (
-                    <p className={styles.errorText}>{errors.password[0]}</p>
+                    <p className={styles.errorText} style={{color: 'red', fontSize: '12px', marginTop: '4px'}}>{errors.password[0]}</p>
                   )}
                 </div>
 
@@ -163,12 +173,14 @@ export default function RegisterPage() {
               </form>
 
               {message && (
-                <div className={styles.success} aria-live="polite">
+                <div className={styles.success} style={{marginTop: '10px', textAlign: 'center', fontWeight: 'bold'}}>
                   {message}
                 </div>
               )}
 
-              <div className={styles.divider} />
+              {/* DIVIDER Y FOOTER IGUAL QUE LOGIN */}
+              <div className={styles.divider} style={{margin: '20px 0', borderTop: '1px solid var(--border)'}} />
+              
               <p className={styles.footer}>
                 ¿Ya tienes una cuenta?{" "}
                 <button
@@ -179,8 +191,8 @@ export default function RegisterPage() {
                   Iniciar sesión
                 </button>
               </p>
-            </section>
-          </div>
+            </div>
+          </section>
         </div>
       </section>
     </main>

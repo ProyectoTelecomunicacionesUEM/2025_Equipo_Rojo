@@ -1,26 +1,23 @@
 /* ---------- Layout general ---------- */
 
-/* Más ancho disponible y menos padding lateral si molesta */
 .page {
   min-height: 100vh;
   background: var(--background);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 20px;   /* antes 40px; así ganas ~40px de ancho total */
-  padding-top: 24px;    /* mantienes el espacio del topbar */
+  padding: 24px 20px;
+  padding-top: 24px;
 }
 
-/* Aumenta el tope del layout */
 .split {
   width: 100%;
-  max-width: 1360px;    /* antes 1200px; súbelo a 1320–1440 si quieres */
+  max-width: 1360px; /* Layout más ancho como pediste */
   display: grid;
-  grid-template-columns: 1.6fr 1fr;  /* más espacio a la izquierda */
+  grid-template-columns: 1.6fr 1fr;
   gap: 36px;
   align-items: center;
 }
-
 
 /* ---------- Columna izquierda ---------- */
 
@@ -28,25 +25,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;               /* un poco más de aire */
-  min-width: 50%;              /* opcional: más espacio para la ilustración */
+  padding: 20px;
+  min-width: 50%;
 }
-
-
-.leftBrand {
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 800;
-  color: var(--secondary);
-  letter-spacing: -0.02em;
-}
-
-.tagline {
-  margin-top: 10px;
-  font-size: clamp(16px, 2vw, 20px);
-  color: var(--foreground-accent);
-  max-width: 450px;
-}
-
 
 .heroImg {
   display: block;
@@ -59,7 +40,6 @@
   filter: drop-shadow(0 14px 30px rgba(31,87,214,.18));
 }
 
-
 /* ---------- Columna derecha (form) ---------- */
 .right {
   display: flex;
@@ -67,7 +47,6 @@
   justify-content: center;
 }
 
-/* Card profesional / compacto */
 .card {
   width: 100%;
   max-width: 360px;
@@ -85,35 +64,36 @@
   color: var(--foreground);
 }
 
-/* ---------- Selector de rol ---------- */
+/* ---------- Selector de rol (Arreglado para Móvil) ---------- */
 .roleRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-bottom: 12px;
+  background: #f3f4f6; /* Fondo para que el blanco/azul resalte */
+  padding: 4px;
+  border-radius: 12px;
 }
 
 .roleBtn {
   padding: 8px 12px;
   border-radius: 10px;
-  border: 1px solid #d1d5db;
-  background: #fff;
+  border: none; /* Quitamos borde para estilo bloque sólido */
+  background: transparent;
+  color: #64748b;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: 0.2s;
-}
-
-.roleBtn:hover {
-  border-color: var(--secondary);
-  background: #f3f4ff;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .roleBtnActive {
-  background: var(--secondary);
-  color: #fff;
-  border-color: var(--secondary);
+  background-color: var(--secondary) !important; /* Azul como el botón entrar */
+  color: #fff !important;
   box-shadow: 0 4px 12px rgba(48, 79, 255, .25);
+  opacity: 1 !important;
 }
 
 /* ---------- Formulario ---------- */
@@ -127,6 +107,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%; /* Asegura que el campo ocupe todo */
 }
 
 .label {
@@ -136,6 +117,7 @@
 }
 
 .input {
+  width: 100%; /* Importante para que todos midan lo mismo */
   height: 38px;
   padding: 8px 10px;
   border-radius: 10px;
@@ -152,8 +134,36 @@
   outline: none;
 }
 
+/* ---------- Arreglo Contraseña (Igual tamaño que el resto) ---------- */
+.passwordWrapper {
+  position: relative;
+  width: 100%; /* Esto hace que la caja sea igual que Nombre/Email */
+  display: flex;
+  align-items: center;
+}
+
+.passwordWrapper .input {
+  padding-right: 40px; /* Espacio para el ojo sin encoger el input */
+}
+
+.eyeButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  z-index: 10;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* ---------- Botón principal ---------- */
 .button {
+  width: 100%;
   height: 40px;
   background: var(--secondary);
   color: #fff;
@@ -165,28 +175,21 @@
   transition: 0.2s;
 }
 
-.button:hover {
-  background: #2745f2;
-}
-
-.button:active {
-  transform: scale(0.97);
-}
+.button:hover { background: #2745f2; }
+.button:active { transform: scale(0.97); }
 
 /* ---------- Footer ---------- */
-
-
 .link {
   color: var(--secondary);
   font-weight: 700;
-  font-size: clamp(16px, 1.8vw, 22px); /* más grande y escalable */
+  font-size: clamp(16px, 1.8vw, 22px);
   text-decoration: none;
-  text-underline-offset: 3px;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-.link:hover { 
-  text-decoration: underline; 
-}
+.link:hover { text-decoration: underline; }
 
 /* ---------- TOPBAR ---------- */
 .topbar {
@@ -213,14 +216,10 @@
   font-size: clamp(32px, 5vw, 56px);
   font-weight: 800;
   color: #fff;
-  letter-spacing: -0.3px;
+  text-decoration: none;
 }
 
-
 .loginLink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   padding: 10px 20px;
   border-radius: 999px;
   background: #fff;
@@ -228,10 +227,7 @@
   font-size: clamp(16px, 2vw, 24px);
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-  transition: background .15s ease, box-shadow .15s ease, transform .06s ease;
 }
-
 
 /* ---------- Responsive ---------- */
 @media (max-width: 980px) {
@@ -239,26 +235,12 @@
     grid-template-columns: 1fr;
     gap: 28px;
   }
-
-  .leftBrand, .tagline {
-    text-align: center;
+  .heroImg {
+    max-width: 780px;
+    margin: 0 auto;
   }
-
- 
-.heroImg {
-  width: 100%;
-  max-width: 780px;    /* antes 500–520px */
-  height: auto;
-  object-fit: contain;
-}
 }
 
 @media (max-width: 720px) {
-  .topbarInner {
-    padding: 16px 24px;
-  }
-  .loginLink {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-  }
+  .topbarInner { padding: 16px 24px; }
 }
