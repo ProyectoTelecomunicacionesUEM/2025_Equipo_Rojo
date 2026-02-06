@@ -92,12 +92,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <DarkModeToggle />
           
-          <div style={{ textAlign: "right", minWidth: '0', flexShrink: 1 }}>
-            <div style={{ color: "var(--foreground)", fontSize: "11px", fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ textAlign: "right", minWidth: '0', flexShrink: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {/* Email con letra más grande (14px) */}
+            <div style={{ 
+              color: "var(--foreground)", 
+              fontSize: "14px", 
+              fontWeight: 700, 
+              overflow: 'hidden', 
+              textOverflow: 'ellipsis', 
+              whiteSpace: 'nowrap' 
+            }}>
               {session?.user?.email}
             </div>
-            <div style={badgeRol(isAdmin)}>
-              {isAdmin ? "ADMIN" : "USER"}
+
+            {/* Badge del Rol un pelín más grande también si lo necesitas */}
+            <div style={{ 
+              ...badgeRol(isAdmin), 
+              fontSize: "10px", // Un poco más legible que el estándar suele ser mejor
+              padding: "2px 8px" 
+            }}>
+              {isAdmin ? "ADMINISTRADOR" : "USUARIO"}
             </div>
           </div>
           
